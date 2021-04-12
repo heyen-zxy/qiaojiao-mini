@@ -1,21 +1,21 @@
 <template>
 	<view class="tui-safe-area">
 		<view class="tui-address">
-			<block v-for="(item,index) in 3" :key="index">
+			<block v-for="(item,index) in addressList" :key="index">
 				<tui-list-cell padding="0">
-					<view class="tui-address-flex">
-						<view class="tui-address-left">
+					<view class="tui-address-flex" >
+						<view class="tui-address-left" @click="selectAddress(item.id)">
 							<view class="tui-address-main">
-								<view class="tui-address-name tui-ellipsis">{{["echo.","王大大","大长腿"][index]}}</view>
-								<view class="tui-address-tel">138****7708</view>
+								<view class="tui-address-name tui-ellipsis">{{item.name}}</view>
+								<view class="tui-address-tel">{{item.phone}}</view>
 							</view>
 							<view class="tui-address-detail">
-								<view class="tui-address-label" v-if="index===0">默认</view>
-								<view class="tui-address-label" v-if="index!=2">{{["公司","住宅","其它"][index]}}</view>
-								<text>广东省深圳市南山区高新科技园中区一路</text>
+								<view class="tui-address-label" v-if="item.default">默认</view>
+								<view class="tui-address-label" v-if="item.address_type">{{item.show_address_type}}</view>
+								<text>{{item.address_name}}</text>
 							</view>
 						</view>
-						<view class="tui-address-imgbox">
+						<view class="tui-address-imgbox" @click="editAddr(item.id)">
 							<image class="tui-address-img" src="/static/images/mall/my/icon_addr_edit.png" />
 						</view>
 					</view>
@@ -32,6 +32,7 @@
 <script>
 	import tuiButton from "@/components/extend/button/button"
 	import tuiListCell from "@/components/list-cell/list-cell"
+	import api from "../../api.js"
 	export default {
 		components: {
 			tuiButton,
@@ -43,14 +44,29 @@
 			}
 		},
 		onLoad: function(options) {
-
+			let _this = this
+			api.addresses().then(function(data){
+				_this.addressList = data
+				console.log(data)
+			})
 		},
 		onShow: function() {},
 		methods: {
-			editAddr(index, addressType) {
+			editAddr(id) {
+				let url = id ? ("../address/edit?id=" + id) : "../address/edit"
 				uni.navigateTo({
-					url: "../address/edit"
+					url: url
 				})
+			},
+			selectAddress(id){
+				console.log(id)
+				uni.setStorageSync('addressId', id) 
+				let orderId = uni.getStorageSync('currentOrderId')
+				if(orderId){
+					uni.redirectTo({
+						url: '../orders/show?select_address=1&id=' + orderId
+					})
+				}
 			}
 		}
 	}

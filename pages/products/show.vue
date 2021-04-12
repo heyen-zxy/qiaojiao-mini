@@ -8,9 +8,6 @@
 			<view class="tui-header-icon" :style="{marginTop:top+'px'}">
 				<view class="tui-icon tui-icon-arrowleft tui-icon-back" :style="{color:opcity>=1?'#000':'#fff',background:'rgba(0, 0, 0,'+iconOpcity+')'}"
 				 @tap="back"></view>
-				<view class="tui-icon tui-icon-more-fill  tui-icon-ml" :style="{color:opcity>=1?'#000':'#fff',background:'rgba(0, 0, 0,'+iconOpcity+')',fontSize:'20px'}"
-				 @tap.stop="openMenu"></view>
-				<tui-badge type="red" size="small">5</tui-badge>
 			</view>
 		</view>
 		<!--header-->
@@ -18,13 +15,13 @@
 		<!--banner-->
 		<view class="tui-banner-swiper">
 			<swiper :autoplay="true" :interval="5000" :duration="150" :circular="true" :style="{height:scrollH + 'px'}" @change="bannerChange">
-				<block v-for="(item,index) in banner" :key="index">
+				<block v-for="(item,index) in product.attachments" :key="index">
 					<swiper-item :data-index="index" @tap.stop="previewImage">
-						<image :src="item" class="tui-slide-image" :style="{height:scrollH+'px'}" />
+						<image :src="item.preview_url" class="tui-slide-image" :style="{height:scrollH+'px'}" />
 					</swiper-item>
 				</block>
 			</swiper>
-			<tui-tag type="translucent" shape="circleLeft" size="small">{{bannerIndex+1}}/{{banner.length}}</tui-tag>
+			<tui-tag type="translucent" shape="circleLeft" size="small">{{bannerIndex+1}}/{{product.attachments.length}}</tui-tag>
 		</view>
 
 		<!--banner-->
@@ -33,31 +30,22 @@
 			<view class="tui-product-title tui-border-radius">
 				<view class="tui-pro-pricebox tui-padding">
 					<view class="tui-pro-price">
-						<view>￥<text class="tui-price">49</text>.00</view>
+						<view>￥<text class="tui-price">{{product.price}}</text></view>
 					</view>
 				
 				</view>
-				<view class="tui-original-price tui-gray">
-					价格
-					<text class="tui-line-through">￥199.00</text>
+				<view class="tui-original-price tui-gray" v-if="product.view_commission > 0">
+					<text>佣￥{{product.view_commission}}</text>
 				</view>
 				<view class="tui-pro-titbox">
-					<view class="tui-pro-title">led灯管t5一体化支架全套1.2米家用T8灯条日光长条灯超亮节能光管</view>
+					<view class="tui-pro-title">{{product.name}}</view>
 				</view>
 			</view>
 
 			<view class="tui-basic-info tui-mtop tui-radius-all">
 				<view class="tui-list-cell" @tap="showPopup">
 					<view class="tui-bold tui-cell-title">已选</view>
-					<view class="tui-selected-box">led灯管t5【A2】,1个，可选服务</view>
-					<tui-icon name="more-fill" :size="20" class="tui-right" color="#666"></tui-icon>
-				</view>
-				<view class="tui-list-cell" @tap="showPopup">
-					<view class="tui-bold tui-cell-title">送至</view>
-					<view class="tui-addr-box">
-						<view class="tui-addr-item">北京朝阳区三环到四环之间</view>
-						<view class="tui-addr-item">今日23:59前完成下单，预计6月28日23:30前发货，7月1日24:00前送达</view>
-					</view>
+					<view class="tui-selected-box">{{selectNorm.name}}</view>
 					<tui-icon name="more-fill" :size="20" class="tui-right" color="#666"></tui-icon>
 				</view>
 				<view class="tui-list-cell tui-last">
@@ -79,45 +67,21 @@
 					</view>
 					<view class="tui-guarantee-item">
 						<tui-icon name="circle-selected" :size="14" color="#999"></tui-icon>
-						<text class="tui-pl">闪电退款</text>
-					</view>
-					<view class="tui-guarantee-item">
-						<tui-icon name="circle-selected" :size="14" color="#999"></tui-icon>
 						<text class="tui-pl">极速审核</text>
 					</view>
-				</view>
-			</view>
-
-			<view class="tui-cmt-box tui-mtop tui-radius-all">
-				<view class="tui-list-cell tui-last tui-between">
-					<view class="tui-bold tui-cell-title">评价</view>
-					<view @tap="common">
-						<text class="tui-cmt-all">查看全部</text>
-						<view class="tui-icon tui-icon-more-fill" style="color:#ff201f; font-size: 20px;"></view>
-						<!-- <tui-icon name="more-fill" size="20" color="#ff201f"></tui-icon> -->
-					</view>
-				</view>
-
-				<view class="tui-cmt-content tui-padding">
-					<view class="tui-cmt-user">
-						<image src="../../static/images/news/avatar_2.jpg" class="tui-acatar"></image>
-						<view>z***9</view>
-					</view>
-					<view class="tui-cmt">物流很快，很适合我的风格❤</view>
-					<view class="tui-attr">颜色：叠层钛钢流苏耳环（A74）</view>
-				</view>
-
-				<view class="tui-cmt-btn">
-					<tui-tag type="black" :plain="true" tui-tag-class="tui-tag-cmt" @tap="common">查看全部评价</tui-tag>
 				</view>
 			</view>
 
 			<view class="tui-nomore-box">
 				<tui-nomore text="宝贝详情" :visible="true" bgcolor="#f7f7f7"></tui-nomore>
 			</view>
-			<view class="tui-product-img tui-radius-all">
-				<image :src="'../../static/images/mall/product/detail/'+(index+1)+'.jpg'" v-for="(img,index) in 2" :key="index" mode="widthFix"></image>
+			<view>
+				<rich-text :nodes="desc">
+				</rich-text>
 			</view>
+			<!-- <view class="tui-product-img tui-radius-all">
+				<image :src="'../../static/images/mall/product/detail/'+(index+1)+'.jpg'" v-for="(img,index) in 2" :key="index" mode="widthFix"></image>
+			</view> -->
 			<tui-nomore text="已经到最底了" :visible="true" bgcolor="#f7f7f7"></tui-nomore>
 			<view class="tui-safearea-bottom"></view>
 		</view>
@@ -139,39 +103,14 @@
 
 		<!--底部操作栏--->
 
-		<!--顶部下拉菜单-->
-		<tui-top-dropdown tui-top-dropdown="tui-top-dropdown" bgcolor="rgba(76, 76, 76, 0.95)" :show="menuShow" :height="0"
-		 @close="closeMenu">
-			<view class="tui-menu-box tui-padding tui-ptop">
-				<view class="tui-menu-header" :style="{paddingTop:top+'px'}">
-					功能直达
-				</view>
-				<view class="tui-menu-itembox">
-					<block v-for="(item,index) in topMenu" :key="index">
-						<view class="tui-menu-item" hover-class="tui-opcity" :hover-stay-time="150" @tap="common">
-							<view class="tui-badge-box">
-								<tui-icon :name="item.icon" color="#fff" :size="item.size"></tui-icon>
-								<tui-badge type="red" tui-badge-class="tui-menu-badge" size="small" v-if="item.badge">{{item.badge}}</tui-badge>
-							</view>
-							<view class="tui-menu-text">{{item.text}}</view>
-						</view>
-					</block>
-				</view>
-				<view class="tui-icon tui-icon-up" style="color: #fff; font-size: 26px;" @tap.stop="closeMenu"></view>
-				<!-- <tui-icon name="up" color="#fff" size="26" class="tui-icon-up" @tap.stop="closeMenu"></tui-icon> -->
-			</view>
-
-		</tui-top-dropdown>
-		<!---顶部下拉菜单-->
-
 		<!--底部选择层-->
 		<tui-bottom-popup :show="popupShow" @close="hidePopup">
 			<view class="tui-popup-box">
 				<view class="tui-product-box tui-padding">
-					<image src="../../static/images/mall/product/detail/3.jpg" class="tui-popup-img"></image>
+					<image :src="product.attachments[0].preview_url" class="tui-popup-img"></image>
 					<view class="tui-popup-price">
-						<view class="tui-amount tui-bold">￥49.00</view>
-						<view class="tui-number">编号:4373299399393</view>
+						<view class="tui-amount tui-bold">￥{{selectNorm.price}}</view>
+						<view class="tui-number">编号:{{product.no}}</view>
 					</view>
 				</view>
 				<scroll-view scroll-y class="tui-popup-scroll">
@@ -182,27 +121,18 @@
 						</view>
 						<view class="tui-bold tui-attr-title">尺寸</view>
 						<view class="tui-attr-box">
-							<view class="tui-attr-item">
-								1米
+							<view class="tui-attr-item" v-for="(norm,index) in product.norms" :class="selectNorm.id == norm.id ? 'tui-attr-active' : ''" @tap="select(norm.id)">
+								{{norm.name}}
 							</view>
-							<view class="tui-attr-item">
-								1.2米
-							</view>
-							<view class="tui-attr-item">
-								1.4米
-							</view>
-							<view class="tui-attr-item tui-attr-active">
-								16米
-							</view>
+			
 						</view>
 					</view>
 				</scroll-view>
 				<view class="tui-operation tui-operation-right tui-right-flex tui-popup-btn">
 					<view class="tui-flex-1">
-						<tui-button type="red" shape="circle" size="mini" @click="hidePopup">加入购物车</tui-button>
 					</view>
 					<view class="tui-flex-1">
-						<tui-button type="warning" shape="circle" size="mini" @click="submit">立即购买</tui-button>
+						<tui-button :disabled="ordering && (selectNorm.id ? false : true)" type="warning" shape="circle" size="mini" @click="submit">立即购买</tui-button>
 					</view>
 				</view>
 				<view class="tui-icon tui-icon-close-fill tui-icon-close" style="color: #999;font-size:20px" @tap="hidePopup"></view>
@@ -210,6 +140,17 @@
 			</view>
 		</tui-bottom-popup>
 		<!--底部选择层-->
+		
+		<tui-modal :show="isCanUse" @cancel="hideUserInfo" :custom="true" :maskClosable="false">
+			<view class="tui-modal-custom">
+				<image src="/static/images/logo.png" class="tui-tips-img"></image>
+				<view class="tui-modal-custom-text">申请获取以下权限</view>
+				<view class="tui-modal-custom-text-small">获取您的公开信息(昵称，头像，性别)</view>
+				<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
+			
+			</view>
+		</tui-modal>
+		<!--加载loadding-->
 
 	</view>
 </template>
@@ -223,6 +164,8 @@
 	import tuiTopDropdown from "@/components/top-dropdown/top-dropdown"
 	import tuiBottomPopup from "@/components/bottom-popup/bottom-popup"
 	import tuiNumberbox from "@/components/numberbox/numberbox"
+	import tuiModal from "@/components/modal/modal"
+	import api from "../../api.js"
 	export default {
 		components: {
 			tuiIcon,
@@ -232,7 +175,8 @@
 			tuiButton,
 			tuiTopDropdown,
 			tuiBottomPopup,
-			tuiNumberbox
+			tuiNumberbox,
+			tuiModal
 		},
 		data() {
 			return {
@@ -241,54 +185,20 @@
 				scrollH: 0, //滚动总高度
 				opcity: 0,
 				iconOpcity: 0.5,
-				banner: [
-					"../../static/images/mall/product/detail/3.jpg",
-					"../../static/images/mall/product/detail/4.jpg"
-				],
+				product: {},
+				selectNorm: {price: ''},
 				bannerIndex: 0,
-				topMenu: [{
-					icon: "message",
-					text: "消息",
-					size: 26,
-					badge: 3
-				}, {
-					icon: "home",
-					text: "首页",
-					size: 23,
-					badge: 0
-				}, {
-					icon: "people",
-					text: "我的",
-					size: 26,
-					badge: 0
-				}, {
-					icon: "cart",
-					text: "购物车",
-					size: 23,
-					badge: 2
-				}, {
-					icon: "kefu",
-					text: "客服小蜜",
-					size: 26,
-					badge: 0
-				}, {
-					icon: "feedback",
-					text: "我要反馈",
-					size: 23,
-					badge: 0
-				}, {
-					icon: "share",
-					text: "分享",
-					size: 26,
-					badge: 0
-				}],
 				menuShow: false,
 				popupShow: false,
 				value: 1,
-				collected: false
+				collected: false,
+				desc: '',
+				ordering: false
 			}
 		},
 		onLoad: function(options) {
+			console.log(this.isCanUse)
+			let _this = this
 			let obj = {};
 			// #ifdef MP-WEIXIN
 			obj = wx.getMenuButtonBoundingClientRect();
@@ -310,8 +220,53 @@
 					}
 				})
 			}, 50)
+			api.product(options.id).then(function(data){
+				_this.product = data
+				_this.selectNorm = {price: _this.product.price}
+				if(data.desc){
+					_this.desc = _this.formatRichText(data.desc)
+				}
+			}).catch(function(error){console.log(error)})
 		},
 		methods: {
+			formatRichText(html){
+			  let newContent= html.replace(/<img[^>]*>/gi,function(match,capture){
+			        match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
+			        match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
+			        match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
+			        return match;
+			    });
+			    newContent = newContent.replace(/style="[^"]+"/gi,function(match,capture){
+			        match = match.replace(/width:[^;]+;/gi, 'width:100%;').replace(/width:[^;]+;/gi, 'width:100%;');
+			        return match;
+			    });
+			    newContent = newContent.replace(/<br[^>]*\/>/gi, '');
+			    newContent = newContent.replace(/\<img/gi, '<img style="width:100%;height:auto;display:block;margin:10px 0;"');
+			    return newContent;
+			},
+			onShareAppMessage: function(res){
+				return {
+				  title: this.product.name,
+				  path: '/pages/prdocuts/show?id=' + this.product.id  + '&share_token=' + uni.getStorageSync("share_token"),
+				  imageUrl: this.product.main_attachment.preview_url,
+				  success: (res) => {
+					console.log("转发成功", res);
+				  },
+				  fail: (res) => {
+					console.log("转发失败", res);
+				  }
+				}
+			},
+			select(normId){
+				console.log(this.selectNorm.id)
+				console.log(normId)
+				if(this.selectNorm.id == normId){
+					this.selectNorm = {price: this.product.price}
+				}else{
+					let norm = this.product.norms.find(norm => norm.id == normId)
+					this.selectNorm = norm
+				}
+			},
 			bannerChange: function(e) {
 				this.bannerIndex = e.detail.current
 			},
@@ -347,10 +302,28 @@
 				this.tui.toast("功能开发中~")
 			},
 			submit(){
-				this.popupShow = false
-				uni.navigateTo({
-					url: '../orders/new'
-				})
+				let _this = this
+				if(this.selectNorm.id){
+					this.ordering = true
+					uni.showLoading({
+						title: '下单中...'
+					});
+					api.applyOrder(JSON.stringify([{id: this.selectNorm.id, number: this.value}])).then(function(data){
+						if(data.id){
+							uni.hideLoading()
+							_this.ordering = false
+							_this.popupShow = false
+							uni.navigateTo({
+								url: '../orders/show?id=' + data.id
+							})
+						}
+					}).catch(function(error){
+						console.log(error)
+					})
+				}else{
+					this.popupShow = true
+				}
+				
 			},
 			coupon(){
 				uni.navigateTo({

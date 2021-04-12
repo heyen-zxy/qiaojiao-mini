@@ -9,136 +9,158 @@
 		</view>
 		<!--header-->
 		<view class="tui-mybg-box">
-			<image :src="tui.webURL()+'/static/images/mall/my/img_bg_3x.png'" class="tui-my-bg" mode="widthFix"></image>
+			<image src="https://www.thorui.cn/wx/static/images/mall/my/img_bg_3x.png" class="tui-my-bg" mode="widthFix"></image>
 			<view class="tui-header-center">
-				<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-avatar" ></image>
+				<image :src="user.avatar_url" class="tui-avatar" ></image>
 				<view class="tui-info">
-					<view class="tui-nickname">微信名字 
+					<view class="tui-nickname">{{user.nick_name}}
 					</view>
 				</view>
 			</view>
 		</view>
 		<view class="tui-content-box">
 			<view class="tui-box tui-order-box">
-				<tui-list-cell :arrow="true" padding="0" :lineLeft="false" @click="href(4)">
+				<tui-list-cell :arrow="true" padding="0" :lineLeft="false" @click="orders()">
 					<view class="tui-cell-header">
 						<view class="tui-cell-title">我的订单</view>
 						<view class="tui-cell-sub">查看全部订单</view>
 					</view>
 				</tui-list-cell>
 				<view class="tui-order-list">
-					<view class="tui-order-item" @tap="href(4)">
+					<view class="tui-order-item" @tap="orders('wait')">
 						<view class="tui-icon-box">
 							<image src="/static/images/mall/my/icon_daifukuan_3x.png" class="tui-order-icon"></image>
-							<view class="tui-badge tui-badge-red">1</view>
+							<view class="tui-badge tui-badge-red">{{myData.wait_order}}</view>
 						</view>
 						<view class="tui-order-text">待付款</view>
 					</view>
-					<view class="tui-order-item" @tap="href(4)">
+					<view class="tui-order-item" @tap="orders('paid')">
 						<view class="tui-icon-box">
 							<image src="/static/images/mall/my/icon_daifahuo_3x.png" class="tui-order-icon"></image>
-							<view class="tui-badge tui-badge-red">1</view>
+							<view class="tui-badge tui-badge-red">{{myData.paid_order}}</view>
 						</view>
-						<view class="tui-order-text">待发货</view>
+						<view class="tui-order-text">待服务</view>
 					</view>
-					<view class="tui-order-item" @tap="href(4)">
+					<view class="tui-order-item" @tap="orders('served')">
 						<view class="tui-icon-box">
 							<image src="/static/images/mall/my/icon_daishouhuo_3x.png" class="tui-order-icon"></image>
 						</view>
-						<view class="tui-order-text">待收货</view>
-					</view>
-					<view class="tui-order-item" @tap="href(4)">
-						<view class="tui-icon-box">
-							<image src="/static/images/mall/my/icon_pingjia_3x.png" class="tui-order-icon"></image>
-							<view class="tui-badge tui-badge-red" v-if="false">12</view>
-						</view>
-						<view class="tui-order-text">评价</view>
+						<view class="tui-order-text">已完成</view>
 					</view>
 				</view>
 			</view>
 
-			<view class="tui-box tui-assets-box"  @tap="href(2)">
+			<view class="tui-box tui-assets-box"  >
 				<tui-list-cell padding="0" :last="true" :hover="false">
 					<view class="tui-cell-header">
 						<view class="tui-cell-title">我的佣金</view>
 					</view>
 				</tui-list-cell>
 				<view class="tui-order-list tui-assets-list">
-					<view class="tui-order-item">
+					<view class="tui-order-item" @tap="shareOrders()">
 						<view class="tui-assets-num">
-							<text>3</text>
-							<view class="tui-badge-dot"></view>
+							<text>{{myData.share_order}}</text>
 						</view>
 						<view class="tui-assets-text">订单数</view>
 					</view>
-					<view class="tui-order-item">
+					<view class="tui-order-item" @tap="userCommission()">
+						<view class="tui-assets-num" >
+							<text>{{myData.commission_wait}}</text>
+						</view>
+						<view class="tui-assets-text">可提现</view>
+					</view>
+					<view class="tui-order-item" @tap="userCommissionList()">
 						<view class="tui-assets-num">
-							<text>7</text>
-							<view class="tui-badge-dot"></view>
+							<text>{{myData.commission_paid}}</text>
+						</view>
+						<view class="tui-assets-text">已提现</view>
+					</view>
+					<view class="tui-order-item" @tap="userCommissionList()">
+						<view class="tui-assets-num">
+							<text>{{myData.commission}}</text>
 						</view>
 						<view class="tui-assets-text">累计佣金</view>
-					</view>
-					<view class="tui-order-item">
-						<view class="tui-assets-num">
-							<text>1</text>
-						</view>
-						<view class="tui-assets-text">即将到账</view>
-					</view>
-					<view class="tui-order-item">
-						<view class="tui-assets-num">
-							<text>20</text>
-						</view>
-						<view class="tui-assets-text">已到账</view>
 					</view>
 				</view>
 			</view>
 
-			<view class="tui-box tui-assets-box"  @tap="href(3)">
+			<view class="tui-box tui-assets-box"  v-if="isAdmin">
 				<tui-list-cell padding="0" :last="true" :hover="false">
 					<view class="tui-cell-header">
-						<view class="tui-cell-title">我负责的订单</view>
+						<view class="tui-cell-title">订单服务佣金</view>
 					</view>
 				</tui-list-cell>
 				<view class="tui-order-list tui-assets-list">
-					<view class="tui-order-item">
+					<view class="tui-order-item" @tap="serverOrders('paid')">
 						<view class="tui-assets-num">
-							<text>10</text>
-							<view></view>
-						</view>
-						<view class="tui-assets-text">订单数</view>
-					</view>
-					<view class="tui-order-item">
-						<view class="tui-assets-num">
-							<text>7</text>
-							<view class="tui-badge-dot"></view>
+							<text>{{myData.admin_paid_order}}</text>
+							<view class="tui-badge-dot" v-if="myData.admin_paid_order > 0"></view>
 						</view>
 						<view class="tui-assets-text">待服务</view>
 					</view>
-					<view class="tui-order-item">
+					<view class="tui-order-item" @tap="serverOrders('served')">
 						<view class="tui-assets-num">
-							<text>0</text>
+							<text>{{myData.admin_served_order}}</text>
 						</view>
 						<view class="tui-assets-text">已服务</view>
+					</view>
+					<view class="tui-order-item" @tap="adminCommission()">
+						<view class="tui-assets-num">
+							<text>{{myData.admin_commission_wait}}</text>
+						</view>
+						<view class="tui-assets-text">可提现</view>
+					</view>
+					<view class="tui-order-item" @tap="adminCommissionList()">
+						<view class="tui-assets-num">
+							<text>{{myData.admin_commission_paid}}</text>
+						</view>
+						<view class="tui-assets-text">已经提现</view>
+					</view>
+				</view>
+			</view>
+			
+			<view class="tui-box tui-assets-box" >
+				<tui-list-cell padding="0" :last="true" :hover="false">
+					<view class="tui-cell-header">
+						<view class="tui-cell-title">其它服务</view>
+					</view>
+				</tui-list-cell>
+				<view class="tui-order-list tui-assets-list">
+					<view class="tui-order-item" @tap="phoneCall">
+						<view class="tui-assets-num" style="margin-bottom: 15rpx;">
+							<tui-icon name="voipphone" size="20" color="grey"></tui-icon>
+						</view>
+						<view class="tui-assets-text">客服电话</view>
+					</view>
+					<view class="tui-order-item">
+						<view class="tui-assets-num">
+							<image src="../../static/images/user.png" style="width: 50rpx;height:50rpx;"></image>
+						</view>
+						<view >
+							<button open-type="contact" class="tui-assets-text" style="background-color: white;">微信客服</button
+						</view>
+					</view>
+					<view class="tui-order-item" >
 					</view>
 				</view>
 			</view>
 
 			<!--为你推荐-->
-			<tui-divider :size="28" :bold="true" color="#333" width="50%">为你推荐</tui-divider>
+			<tui-divider :size="28" :bold="true" color="#333" width="50%">为您推荐</tui-divider>
 			<view class="tui-product-list">
 				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2!=0">
+					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2!=0">
 						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'/static/images/mall/product/detail/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
+							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
 							<view class="tui-pro-content">
 								<view class="tui-pro-tit">{{item.name}}</view>
 								<view>
 									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
+										<text class="tui-sale-price">￥{{item.price}}</text>
+										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
 									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									<view class="tui-pro-pay">{{item.sale}}人付款</view>
 								</view>
 							</view>
 						</view>
@@ -147,26 +169,36 @@
 					</block>
 				</view>
 				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2==0">
+					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2==0">
 						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'/static/images/mall/product/detail/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
+							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
 							<view class="tui-pro-content">
 								<view class="tui-pro-tit">{{item.name}}</view>
 								<view>
 									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
+										<text class="tui-sale-price">￥{{item.price}}</text>
+										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
 									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									<view class="tui-pro-pay">{{item.sale}}人付款</view>
 								</view>
 							</view>
 						</view>
+						<!--商品列表-->
+						<!-- <template is="productItem" data="{{item,index:index}}" /> -->
 					</block>
 				</view>
 			</view>
+			</view>
 			<!--加载loadding-->
 			<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
+			<tui-modal :show="modal" @cancel="hide" :custom="true" :fadein="true">
+				<view class="tui-modal-custom">
+					<view class="tui-prompt-title">提现金额</view>
+					<input placeholder="请输入提现金额" class="tui-input" v-model="cash" type="number" />
+					<tui-button shape="circle" type="green" @click="handleClick" :size="26">立即提现</tui-button>
+				</view>
+			</tui-modal>
 		</view>
 	</view>
 </template>
@@ -177,15 +209,33 @@
 	import tuiListCell from "@/components/list-cell/list-cell"
 	import tuiDivider from "@/components/divider/divider"
 	import tuiLoadmore from "@/components/loadmore/loadmore"
+	import tuiModal from "@/components/modal/modal"
+	import api from "../../api.js"
 	export default {
 		components: {
 			tuiIcon,
 			tuiButton,
 			tuiListCell,
 			tuiDivider,
-			tuiLoadmore
+			tuiLoadmore,
+			tuiModal
+		},
+		onShow: function(options){
+			let _this = this
+			api.me().then(function(data){
+				_this.user = data
+				_this.isAdmin = data.admin_id
+			}).catch(function(e){
+				console.log(e)
+			})
+			api.my().then(function(data){
+				_this.myData = data
+			}).catch(function(e){
+				console.log(e)
+			})
 		},
 		onLoad: function(options) {
+			let _this = this
 			let obj = {};
 			// #ifdef MP-WEIXIN
 			obj = wx.getMenuButtonBoundingClientRect();
@@ -205,6 +255,10 @@
 					this.scrollH = res.windowWidth * 0.6
 				}
 			})
+			api.recommendProducts().then(function(data){
+				_this.products = data
+				console.log(data.length)
+			}).catch(function(error){console.log(error)})
 		},
 		data() {
 			return {
@@ -213,110 +267,116 @@
 				scrollH: 0, //滚动总高度
 				opcity: 0,
 				iconOpcity: 0.5,
-				productList: [{
-						img: 1,
-						name: "欧莱雅（LOREAL）奇焕光彩粉嫩透亮修颜霜 30ml（欧莱雅彩妆 BB霜 粉BB 遮瑕疵 隔离）",
-						sale: 599,
-						factory: 899,
-						payNum: 2342
-					},
-					{
-						img: 2,
-						name: "德国DMK进口牛奶  欧德堡（Oldenburger）超高温处理全脂纯牛奶1L*12盒",
-						sale: 29,
-						factory: 69,
-						payNum: 999
-					},
-					{
-						img: 3,
-						name: "【第2支1元】柔色尽情丝柔口红唇膏女士不易掉色保湿滋润防水 珊瑚红",
-						sale: 299,
-						factory: 699,
-						payNum: 666
-					},
-					{
-						img: 4,
-						name: "百雀羚套装女补水保湿护肤品",
-						sale: 1599,
-						factory: 2899,
-						payNum: 236
-					},
-					{
-						img: 5,
-						name: "百草味 肉干肉脯 休闲零食 靖江精制猪肉脯200g/袋",
-						sale: 599,
-						factory: 899,
-						payNum: 2399
-					},
-					{
-						img: 6,
-						name: "短袖睡衣女夏季薄款休闲家居服短裤套装女可爱韩版清新学生两件套 短袖粉色长颈鹿 M码75-95斤",
-						sale: 599,
-						factory: 899,
-						payNum: 2399
-					},
-					{
-						img: 1,
-						name: "欧莱雅（LOREAL）奇焕光彩粉嫩透亮修颜霜",
-						sale: 599,
-						factory: 899,
-						payNum: 2342
-					},
-					{
-						img: 2,
-						name: "德国DMK进口牛奶",
-						sale: 29,
-						factory: 69,
-						payNum: 999
-					},
-					{
-						img: 3,
-						name: "【第2支1元】柔色尽情丝柔口红唇膏女士不易掉色保湿滋润防水 珊瑚红",
-						sale: 299,
-						factory: 699,
-						payNum: 666
-					},
-					{
-						img: 4,
-						name: "百雀羚套装女补水保湿护肤品",
-						sale: 1599,
-						factory: 2899,
-						payNum: 236
-					}
+				productList: [
 				],
 				pageIndex: 1,
 				loadding: false,
-				pullUpOn: true
+				pullUpOn: true,
+				user: {},
+				isAdmin: false,
+				modal: false,
+				cash: 0,
+				myData: {
+					wait_order: 0,
+					paid_order: 0,
+					served_order: 0,
+					share_order: 0,
+					commission: 0,
+					commission_wait: 0,
+					commission_paid: 0,
+					admin_paid_order: 0,
+					admin_served_order: 0,
+					admin_commission_wait: 0,
+					admin_commission_paid: 0,
+					can_cash: false
+				},
+				products: [
+				]
 			}
 		},
 		methods: {
-			href(page) {
-				let url = "";
-				switch (page) {
-					case 1:
-					url = "../orders/index"
-						break;
-					case 2:
-					url = "../commissions/index"
-						break;	
-					case 3:
-					url = "../execute_orders/index"
-						break;	
-					default:
-						break;
-				}
-				if(url){
-					uni.navigateTo({
-						url: url
-					})
+			phoneCall(){
+				uni.makePhoneCall({
+				    phoneNumber: '15170802003' //仅为示例
+				});
+			},
+			orders(status){
+				uni.navigateTo({
+					url: "../orders/index?status=" + status 
+				})
+			},
+			userCommission(){
+				
+				if(this.myData.can_cash){
+					this.modal = true
 				}else{
-					this.tui.toast("功能尚未完善~")
+					this.tui.toast("因商户号正常交易90天才可提现所以到2021年7月31号之后可以提取您的佣金到微信零钱，请您耐心等待")
 				}
 			},
-			detail: function() {
+			userCommissionList(){
 				uni.navigateTo({
-					url: '../../productDetail/productDetail'
+					url: "../my/user_commissions"
 				})
+			},
+			adminCommission(){
+				this.tui.toast("师傅的服务费用需要线下结算，了解更多信息拨打下面的客服电话。")
+			},
+			adminCommissionList(){
+				uni.navigateTo({
+					url: "../my/admin_commissions"
+				})
+			},
+			serverOrders(status){
+				if(status){
+					uni.navigateTo({
+						url: "../orders/server?status=" + status 
+					})
+				}else{
+					uni.navigateTo({
+						url: "../orders/server"
+					})
+				}
+				
+			},
+			shareOrders(status){
+				if(status){
+					uni.navigateTo({
+						url: "../orders/share?status=" + status 
+					})
+				}else{
+					uni.navigateTo({
+						url: "../orders/share"
+					})
+				}
+				
+			},
+			detail: function(id) {
+				uni.navigateTo({
+					url: '../products/show?id=' + id
+				})
+			},
+			hide: function(){
+				this.modal = false
+			},
+			handleClick() {
+				console.log(this.cash)
+				let _this = this
+				if(_this.cash && _this.cash > 10){
+					api.cash(this.cash).then(function(data){
+						_this.hide()
+						if(data.status == 'success'){
+							_this.tui.toast("提现请求已发送，请关注微信到账信息")
+						}else{
+							_this.tui.toast(data.message)
+						}
+					}).catch(function(e){
+						console.log(e)
+					})
+				}else{
+					_this.tui.toast("请输出正确的提现金额，最低提现金额为10元")
+				}
+				
+				
 			}
 		},
 		onPageScroll(e) {
@@ -735,21 +795,39 @@
 	}
 
 	.tui-sale-price {
-		font-size: 34rpx;
+		font-size: 25rpx;
 		font-weight: 500;
 		color: #e41f19;
 	}
 
 	.tui-factory-price {
-		font-size: 24rpx;
-		color: #a0a0a0;
-		text-decoration: line-through;
-		padding-left: 12rpx;
+		font-size: 18rpx;
+		color: white;
+		padding-left: 5rpx;
+		padding-right: 5rpx;
+		margin-left: 12rpx;
+		background-color: #e41f19;
 	}
 
 	.tui-pro-pay {
 		padding-top: 10rpx;
-		font-size: 24rpx;
+		font-size: 18rpx;
 		color: #656565;
+	}
+	
+	.tui-modal-custom {
+		text-align: center
+	}
+	
+	.tui-prompt-title {
+		padding-bottom: 20rpx;
+		font-size: 34rpx;
+	}
+	
+	.tui-input {
+		margin: 30rpx 40rpx;
+		border-bottom: 1rpx solid #E6E6E6;
+		padding-bottom: 20rpx;
+		font-size: 32rpx;
 	}
 </style>

@@ -6,22 +6,21 @@
 			"navigationBarTextStyle": "black",
 			"backgroundColorTop": "#F7F7F7",
 			"backgroundColorBottom": "#F7F7F7",
-			"navigationBarTitleText": "巧匠优家",
-			"enablePullDownRefresh": true,
+			"navigationBarTitleText": "佳匠服务",
+			"enablePullDownRefresh": false,
 			"onReachBottomDistance": 50
 		}
 	},{
-		"path": "pages/products/index",
+		"path": "pages/products/list",
 		"style": {
+			"navigationBarTitleText": "商品服务",
 			"navigationBarBackgroundColor": "#fff",
 			"navigationBarTextStyle": "black",
-			"backgroundColorTop": "#F7F7F7",
-			"backgroundColorBottom": "#F7F7F7",
-			"navigationBarTitleText": "商品列表 ",
-			"onReachBottomDistance": 50,
-			"navigationStyle": "custom",
+			"backgroundColorTop": "#fcfcfc",
+			"backgroundColorBottom": "#fcfcfc",
+			"disableScroll": false,
 			"app-plus": {
-				"titleNView": false
+				"bounce": "none"
 			}
 		}
 	},{
@@ -43,7 +42,27 @@
             	"navigationBarTitleText": "我的订单",
             	"navigationBarBackgroundColor": "#fff",
             	"navigationBarTextStyle": "black",
-            	"enablePullDownRefresh": true,
+            	"enablePullDownRefresh": false,
+            	"onReachBottomDistance": 50
+            }
+            
+        },{
+            "path" : "pages/orders/server",                                                                                  
+            "style": {
+            	"navigationBarTitleText": "我负责的订单",
+            	"navigationBarBackgroundColor": "#fff",
+            	"navigationBarTextStyle": "black",
+            	"enablePullDownRefresh": false,
+            	"onReachBottomDistance": 50
+            }
+            
+        },{
+            "path" : "pages/orders/share",                                                                                  
+            "style": {
+            	"navigationBarTitleText": "我分享的订单",
+            	"navigationBarBackgroundColor": "#fff",
+            	"navigationBarTextStyle": "black",
+            	"enablePullDownRefresh": false,
             	"onReachBottomDistance": 50
             }
             
@@ -64,6 +83,14 @@
             	"navigationBarTextStyle": "black"
             }
         }
+		,{
+		    "path" : "pages/orders/show_server",
+		    "style": {
+		    	"navigationBarTitleText": "订单详情",
+		    	"navigationBarBackgroundColor": "#fff",
+		    	"navigationBarTextStyle": "black"
+		    }
+		}
         ,{
             "path" : "pages/orders/result",                                                                                   
             "style": {
@@ -97,7 +124,7 @@
             	"navigationBarTitleText": "我的",
             	"navigationBarBackgroundColor": "#fff",
             	"navigationBarTextStyle": "black",
-            	"enablePullDownRefresh": true,
+            	"enablePullDownRefresh": false,
             	"onReachBottomDistance": 50,
             	"navigationStyle": "custom",
             	"app-plus": {
@@ -112,7 +139,7 @@
             	"navigationBarTitleText": "我的返佣订单",
             	"navigationBarBackgroundColor": "#fff",
             	"navigationBarTextStyle": "black",
-            	"enablePullDownRefresh": true,
+            	"enablePullDownRefresh": false,
             	"onReachBottomDistance": 50
             }
             
@@ -123,7 +150,7 @@
             	"navigationBarTitleText": "我负责的订单",
             	"navigationBarBackgroundColor": "#fff",
             	"navigationBarTextStyle": "black",
-            	"enablePullDownRefresh": true,
+            	"enablePullDownRefresh": false,
             	"onReachBottomDistance": 50
             }
             
@@ -133,8 +160,41 @@
             	"navigationBarTitleText": "订单详情",
             	"navigationBarBackgroundColor": "#fff",
             	"navigationBarTextStyle": "black",
-            	"enablePullDownRefresh": true,
+            	"enablePullDownRefresh": false,
             	"onReachBottomDistance": 50
+            }
+            
+        },{
+            "path" : "pages/my/user_commissions",
+            "style": {
+            	"navigationBarTitleText": "我的佣金",
+            	"navigationBarBackgroundColor": "#fff",
+            	"navigationBarTextStyle": "black",
+            	"enablePullDownRefresh": false,
+            	"onReachBottomDistance": 50
+            }
+            
+        },{
+            "path" : "pages/my/admin_commissions",
+            "style": {
+            	"navigationBarTitleText": "我的酬佣",
+            	"navigationBarBackgroundColor": "#fff",
+            	"navigationBarTextStyle": "black",
+            	"enablePullDownRefresh": false,
+            	"onReachBottomDistance": 50
+            }
+            
+        }
+        
+        ,{
+            "path" : "pages/messages/index",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的酬佣",
+                "navigationBarBackgroundColor": "#fff",
+                "navigationBarTextStyle": "black",
+                "enablePullDownRefresh": true,
+                "onReachBottomDistance": 50
             }
             
         }
@@ -159,10 +219,16 @@
 				"selectedIconPath": "static/images/tabbar/home_red.png"
 			},
 			{
-				"pagePath": "pages/products/index",
-				"text": "商品",
+				"pagePath": "pages/products/list",
+				"text": "商品服务",
 				"iconPath": "static/images/tabbar/list.png",
 				"selectedIconPath": "static/images/tabbar/list_red.png"
+			},
+			{
+				"pagePath": "pages/messages/index",
+				"text": "本地消息",
+				"iconPath": "static/images/tabbar/around.png",
+				"selectedIconPath": "static/images/tabbar/around_red.png"
 			},
 			{
 				"pagePath": "pages/my/index",

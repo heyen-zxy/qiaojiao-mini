@@ -1,7 +1,5 @@
 <template>
 	<view class="container">
-		<tui-tabs :tabs="tabs" :isFixed="scrollTop>=0" :currentTab="currentTab" selectedColor="#E41F19" sliderBgColor="#E41F19"
-		 @change="change"></tui-tabs>
 		<!--选项卡逻辑自己实现即可，此处未做处理-->
 		<view :class="{'tui-order-list':scrollTop>=0}">
 			<view class="tui-order-item" v-for="(order,orderIndex) in orders" :key="order.id">
@@ -20,7 +18,7 @@
 								<view class="tui-goods-attr">{{order_norm.norm.name}}</view>
 							</view>
 							<view class="tui-price-right">
-								<view>￥{{order_norm.view_price}}</view>
+								<view>￥{{order_norm.product.view_commission}}</view>
 								<view>x{{order_norm.number}}</view>
 							</view>
 						</view>
@@ -30,7 +28,7 @@
 					<view class="tui-goods-price">
 						<view>合计：</view>
 						<view class="tui-size-24">￥</view>
-						<view class="tui-price-large">{{order.view_amount}}</view>
+						<view class="tui-price-large">{{order.view_commission}}</view>
 					</view>
 				</tui-list-cell>
 			</view>
@@ -63,35 +61,21 @@
 		data() {
 			return {
 				tabs: [{
-					name: "全部"
+					name: "即将到账"
 				}, {
-					name: "待付款"
-				}, {
-					name: "待服务"
-				}, {
-					name: "已完成"
+					name: "已到账"
 				}],
 				orders: [],
 				currentTab: 'all',
 				pageIndex: 1,
 				loadding: false,
 				pullUpOn: true,
-				scrollTop: 0,
-				status: '',
-				statuses: ['', 'wait', 'paid', 'served']
+				scrollTop: 0
 			}
-		},
-		onShow: function(){
-			this.orders = []
-			this.pageIndex = 1
-			this.getOrders()
 		},
 		onLoad: function(options){
-			console.log(2)
-			if(options.status){
-				this.status = options.status
-				this.currentTab = this.statuses.indexOf(options.status)
-			}
+			let _this = this
+			this.getOrders()
 		},
 		methods: {
 			change(e) {
@@ -102,21 +86,17 @@
 				this.getOrders()
 			},
 			detail(id) {
-				uni.navigateTo({
-					url: '../orders/show?id=' + id
-				})
+				return
 			},
 			getOrders(){
 				let _this = this
-				api.orders(_this.status, _this.pageIndex).then(function(data){
+				api.shareOrders(_this.pageIndex).then(function(data){
 					if(data){
 						_this.orders = _this.orders.concat(data)
 					}
 					uni.stopPullDownRefresh()
 					_this.loadding = false
-					if(!data[0]){
-						_this.pullUpOn = false
-					}
+					_this.pullUpOn = false
 				}).catch(function(e){
 					
 				})
@@ -128,10 +108,9 @@
 			this.getOrders()
 		},
 		onReachBottom() {
-			if(this.loadding || !this.pullUpOn){
-				return
-			}
 			//只是测试效果，逻辑以实际数据为准
+			this.loadding = true
+			this.pullUpOn = true
 			this.pageIndex =  this.pageIndex + 1
 			this.getOrders()
 		},
@@ -144,10 +123,6 @@
 <style>
 	.container {
 		padding-bottom: env(safe-area-inset-bottom);
-	}
-
-	.tui-order-list {
-		margin-top: 80rpx;
 	}
 
 	.tui-order-item {

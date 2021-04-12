@@ -1,23 +1,19 @@
 <template>
 	<view class="container">
 		<tui-tips position="center" ref="toast" ></tui-tips>
-		<tui-list-cell :arrow="true" :last="true" :radius="true" @click="chooseAddr" >
+		<tui-list-cell :last="true" :radius="true" @click="phoneCall" >
 			<view class="tui-address">
-				<view v-if="address.id">
-					<view class="tui-userinfo">
-						<text class="tui-name">{{address.name}}</text> {{address.phone}}
-					</view>
-					<view class="tui-addr">
-						<view class="tui-addr-tag">{{address.address_type}}</view>
-						<text>{{address.address_name}}</text>
-					</view>
+				<view class="tui-userinfo">
+					<text class="tui-name">{{address.name}}</text> {{address.phone}}
 				</view>
-				<view class="tui-none-addr" v-else>
-					<image src="/static/images/index/map.png" class="tui-addr-img" mode="widthFix"></image>
-					<text>选择收货地址</text>
+				<view class="tui-addr">
+					<view class="tui-addr-tag">{{address.address_type}}</view>
+					<text>{{address.address_name}}</text>
 				</view>
 			</view>
-			<view class="tui-bg-img"></view>
+			<view class="tui-phone">
+				<tui-icon name="voipphone" size="30" color="grey"></tui-icon>
+			</view>
 		</tui-list-cell>
 
 		<view class="tui-order-item">
@@ -83,28 +79,38 @@
 					<view class="tui-item-title">配送方式:</view>
 					<view class="tui-item-content">送货上门</view>
 				</view>
-				<view class="tui-order-flex" v-if="order.desc || order.status != 'wait'">
+				<view class="tui-order-flex">
 					<view class="tui-item-title">订单备注:</view>
 					<view class="tui-item-content">{{order.desc}}</view>
 				</view>
-				<view class="tui-order-flex" v-else>
-					<view class="tui-item-title">订单备注:</view>
-					<input type="text" class="tui-remark" placeholder="选填: 请先和商家协商一致" placeholder-class="tui-phcolor" @input="changDesc"></input>
-				</view>
 			</view>
+		</view>
+		<view class="tui-order-info">
+			<tui-list-cell :hover="false">
+				<view class="tui-order-title">
+					服务证据
+				</view>
+			</tui-list-cell>
+			<view class="tui-news-flex tui-flex-column tui-order-content" >
+				<view class="tui-news-picbox tui-w-full tui-flex-between" >
+					<block v-for="(attachment,index) in order.attachments" :key="attachment.id">
+						<image :src="attachment.preview_url" mode="widthFix" class="tui-block tui-one-third"></image>
+					</block>
+				</view>
+			</view>	
 		</view>
 		<view class="tui-safe-area"></view>
 		<view class="tui-tabbar tui-order-btn">
-			<view class="tui-btn-mr" v-if="order.status == 'wait'">
-				<tui-button type="danger" width="148rpx" height="56rpx" :size="26" shape="circle" @click="destroy">删除</tui-button>
+			<view class="tui-btn-mr">
+				<tui-button type="green" width="148rpx" height="56rpx" :size="26" shape="circle" @click="upload">上传证据</tui-button>
 			</view>
-			<view class="tui-btn-mr" v-if="order.status == 'wait'">
-				<tui-button type="green" width="148rpx" height="56rpx" :size="26" shape="circle" @click="pay">立即支付</tui-button>
+			<view class="tui-btn-mr" v-if="order.status == 'paid'">
+				<tui-button type="danger" width="148rpx" height="56rpx" :size="26" shape="circle" @click="served">完成服务</tui-button>
 			</view>
 		</view>
-		<tui-modal :show="modal" @click="handleClick" @cancel="hide" title="提示" content="确定删除该订单吗？"></tui-modal>
+		<tui-modal :show="modal1" @click="handleClick1" @cancel="hide1" title="提示" content="确定完成服务吗？"></tui-modal>
+		<tui-modal :show="modal2" @click="handleClick2" @cancel="hide2" content="请先上传上传服务证据图" :button="button"></tui-modal>
 	</view>
-	
 </template>
 
 <script>
@@ -129,13 +135,18 @@
 				webURL: "https://www.thorui.cn/wx/static/images/mall/order/",
 				//1-待付款 2-付款成功 3-待收货 4-订单已完成 5-交易关闭
 				status: 1,
-				order: {},
+				order: {attachments: []},
 				address: {
 					id: null
 				},
 				timer: '',
 				desc: '',
-				modal: false
+				modal1: false,
+				modal2: false,
+				button: [{
+					text: "确定",
+					type: 'red'
+				}],
 			}
 			
 		},
@@ -151,137 +162,77 @@
 			}).catch(function(error){
 				console.log(error)
 			})
-			if(options.select_address == 1){
-				if(!_this.address.id){
-					_this.address.id = uni.getStorageSync('addressId')
-					console.log(_this.address.id )
-					if(_this.address.id){
-						api.address(_this.address.id).then(function(data){
-							console.log(data)
-							_this.address = data
-							console.log(_this.address.id)
-						}).catch(function(error){
-						console.log(error)
-						})
-					}
-				}
-			}
 		},
 		methods: {
-			getImg: function(status) {
-				return this.webURL + ["img_order_payment3x.png", "img_order_send3x.png", "img_order_received3x.png",
-					"img_order_signed3x.png", "img_order_closed3x.png"
-				][status - 1]
-			},
-			getStatusText: function(status) {
-				return ["等待您付款", "付款成功", "待收货", "订单已完成", "交易关闭"][status - 1]
-			},
-			getReason: function(status) {
-				return ["剩余时间", "等待卖家发货", "还剩X天XX小时自动确认", "", "超时未付款，订单自动取消"][status - 1]
-			},
-			chooseAddr: function(){
-				if(this.order.status == 'wait' && !this.order.addressId){
-					uni.navigateTo({
-						url: '../address/index'
-					})
+			phoneCall: function(){
+				if(this.address.phone){
+					uni.makePhoneCall({
+					    phoneNumber: this.address.phone //仅为示例
+					});
 				}
 			},
-			changDesc: function(e){
-				this.desc = e.detail.value
-			},
-			checkOrder: function(){
+			upload: function(){
 				let _this = this
-				api.order(_this.order.id).then(function(data){
-					uni.hideLoading()
-					_this.order = data
-					console.log(data.status)
-					if(data.status == 'paid'){
-						clearInterval(_this.timer);
-						uni.reLaunch({
-							url: '../orders/result?id=' + _this.order.id
+				uni.chooseImage({
+					count: 1,
+					sizeType: 'original',
+					success: function(res){
+						uni.showLoading({
+							mask: true,
+							title: '上传中...'
 						})
+						api.serverFile(_this.order.id, res.tempFilePaths[0]).then(function(data){
+							_this.order = JSON.parse(data)
+							uni.hideLoading()
+						}).catch(function(e){
+							console.log(e)
+						})
+					},
+					fail: function(e){
+						console.log('fail')
+					},
+					complete: function(e){
+						console.log('complete')
 					}
-				}).catch(function(e){
-					
+						
 				})
 			},
-			destroy: function(){
-				this.modal = true
+			hide1: function() {
+				this.modal1 = false
 			},
-			handleClick: function(e){
-				this.modal = false
+			hide2: function() {
+				this.modal2 = false
+			},
+			handleClick1(e) {
 				let index = e.index;
 				let _this = this
+				console.log(1);
 				if (index != 0) {
 					uni.showLoading({
 						mask: true,
 						title: '请求中...'
 					})
-					api.deleteOrder(_this.order.id).then(function(data){
-						if(data.req_status == 'success'){
-							uni.navigateBack({
-								url: '../orders/index'
-							})
-						}
+					api.server_order(this.order.id).then(function(data){
+						_this.order = data
+						uni.hideLoading()
 					}).catch(function(e){
-						console.log(data)
+						console.log(e)
 					})
 				}
-				
+				this.hide1()
 			},
-			hide: function(){
-				this.modal = false
+			handleClick2: function(){
+				this.hide2()
 			},
-			pay: function(){
+			served: function(){
 				let _this = this
-				let addressId = _this.order.address_id || _this.address.id
-				if(!addressId){
-					this.$refs.toast.showTips({
-						msg: '请先选择地址',
-						duration: 2000,
-						type: 'danger'
-					});
-					return
+				_this.model1 = true
+				console.log(this.order.attachments)
+				if(this.order.attachments && this.order.attachments[0]){
+					_this.modal1 = true
+				}else{
+					_this.modal2 = true
 				}
-				if(this.order.status != 'wait'){
-					return
-				}
-				uni.showLoading({
-					mask: true,
-					title: '支付中...'
-				})
-				api.wxPay(_this.order.id, addressId, _this.desc).then(function(data){
-					if(data.package){
-						uni.requestPayment({
-							provider: 'wxpay',
-							orderInfo: '佳匠服务',
-							timeStamp: data.timeStamp,
-							nonceStr: data.nonceStr,
-							package: data.package,
-							signType: 'MD5',
-							paySign: data.paySign,
-							success: (e) => {
-								console.log("success", e);
-							},
-							fail: (e) => {
-								console.log("fail", e);
-								uni.hideLoading()
-								uni.showModal({
-									content: "支付失败,原因为: " + e.errMsg,
-									showCancel: false
-								})
-							},
-							complete: () => {
-								console.log('completed')
-							}
-						})
-					}
-					_this.timer = setInterval(function() {
-						_this.checkOrder()
-					}, 2000);
-				}).catch(function(e){
-					console.log(data)
-				})
 			}
 		}
 	}
@@ -291,7 +242,39 @@
 	.container {
 		padding-bottom: 118rpx;
 	}
+	
+	.tui-news-flex {
+		width: 100%;
+		display: flex;
+	}
+	
+	.tui-flex-column {
+		flex-direction: column !important;
+	}
+	
+	.tui-news-picbox {
+		display: flex;
+		position: relative;
+	}
+	
+	.tui-w-full {
+		width: 100%;
+	}
+	
+	.tui-block {
+		display: block;
+	}
+	
+	.tui-one-third {
+		width: 33%;
+	}
+	
+	.tui-flex-between {
+		justify-content: space-between !important;
+	}
+	
 	.tui-address {
+		width: 100%;
 		min-height: 80rpx;
 		padding: 10rpx 0;
 		box-sizing: border-box;

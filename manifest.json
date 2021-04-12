@@ -87,7 +87,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx882d1db19c5feb37",
+        "appid" : "wxe2386c8a4f3b5e92",
         "setting" : {
             "urlCheck" : false
         },
@@ -112,6 +112,9 @@
         "domain" : "https://thorui.cn",
         "router" : {
             "mode" : "history"
+        },
+        "devServer" : {
+            "https" : false
         }
     }
 }

@@ -3,13 +3,13 @@
 		<view class="tui-box">
 			<tui-list-cell :arrow="true" :last="true" :radius="true" @click="chooseAddr">
 				<view class="tui-address">
-					<view v-if="true">
+					<view v-if="address.id">
 						<view class="tui-userinfo">
-							<text class="tui-name">王大大</text> 139****7708
+							<text class="tui-name">{{address.name}}</text> {{address.phone}}
 						</view>
 						<view class="tui-addr">
-							<view class="tui-addr-tag">公司</view>
-							<text>广东省深圳市南山区高新科技园中区一路</text>
+							<view class="tui-addr-tag">{{address.address_type}}</view>
+							<text>{{address.address_name}}</text>
 						</view>
 					</view>
 					<view class="tui-none-addr" v-else>
@@ -25,31 +25,23 @@
 						商品信息
 					</view>
 				</tui-list-cell>
-				<block v-for="(item,index) in 2" :key="index">
-					<tui-list-cell :hover="false" padding="0">
-						<view class="tui-goods-item">
-							<image :src="`/static/images/mall/product/detail/${index+3}.jpg`" class="tui-goods-img"></image>
-							<view class="tui-goods-center">
-								<view class="tui-goods-name">欧莱雅（LOREAL）奇焕光彩粉嫩透亮修颜霜 30ml（欧莱雅彩妆 BB霜 粉BB 遮瑕疵 隔离）</view>
-								<view class="tui-goods-attr">1.3米</view>
-							</view>
-							<view class="tui-price-right">
-								<view>￥298.00</view>
-								<view>x2</view>
-							</view>
+				<tui-list-cell :hover="false" padding="0">
+					<view class="tui-goods-item">
+						<image :src="product.attachments[0].preview_url" class="tui-goods-img"></image>
+						<view class="tui-goods-center">
+							<view class="tui-goods-name">{{product.name}}</view>
+							<view class="tui-goods-attr">{{norm.name}}</view>
 						</view>
-					</tui-list-cell>
-				</block>
+						<view class="tui-price-right">
+							<view>￥{{norm.price}}</view>
+							<view>x{{number}}</view>
+						</view>
+					</view>
+				</tui-list-cell>
 				<tui-list-cell :hover="false">
 					<view class="tui-padding tui-flex">
 						<view>商品总额</view>
-						<view>￥1192.00</view>
-					</view>
-				</tui-list-cell>
-				<tui-list-cell :hover="true" :arrow="true">
-					<view class="tui-padding tui-flex">
-						<view>发票</view>
-						<view class="tui-invoice-text">不开发票</view>
+						<view>￥{{norm.price * number}}</view>
 					</view>
 				</tui-list-cell>
 				<tui-list-cell :hover="false">
@@ -69,8 +61,7 @@
 						<view class="tui-flex-end tui-color-red">
 							<view class="tui-black">合计： </view>
 							<view class="tui-size-26">￥</view>
-							<view class="tui-price-large">1192</view>
-							<view class="tui-size-26">.00</view>
+							<view class="tui-price-large">{{norm.price * number}}</view>
 						</view>
 					</view>
 				</tui-list-cell>
@@ -81,8 +72,7 @@
 			<view class="tui-flex-end tui-color-red tui-pr-20">
 				<view class="tui-black">实付金额: </view>
 				<view class="tui-size-26">￥</view>
-				<view class="tui-price-large">1192</view>
-				<view class="tui-size-26">.00</view>
+				<view class="tui-price-large">{{norm.price * number}}</view>
 			</view>
 			<view class="tui-pr25">
 				<tui-button width="200rpx" height="70rpx" type="danger" shape="circle" @click="btnPay">确认支付</tui-button>
@@ -96,6 +86,7 @@
 	import tuiButton from "@/components/extend/button/button"
 	import tuiListCell from "@/components/list-cell/list-cell"
 	import tuiBottomPopup from "@/components/bottom-popup/bottom-popup"
+	import api from "../../api.js"
 	export default {
 		components: {
 			tuiButton,
@@ -105,8 +96,35 @@
 		data() {
 			return {
 				hasCoupon: true,
-				insufficient: false
+				insufficient: false,
+				norm: {},
+				number: 0,
+				product: {},
+				address: {}
 			}
+		},
+		onLoad: function(options) {
+			this.number = options.value
+			let _this = this
+			api.products({norm_id: options.norm_id}, 1).then(function(data){
+				_this.product = data[0]
+				_this.norm = _this.product.norms.find(norm => norm.id == options.norm_id)
+			}).catch(function(error){console.log(error)})
+			if(options.address_id){
+				api.address(options.address_id).then(function(data){
+					if(data){
+						_this.address = data
+					}
+				})
+			}else{
+				api.defaultAddress().then(function(data){
+					if(data){
+						_this.address = data
+					}
+				})
+			}
+			
+			
 		},
 		methods: {
 			chooseAddr() {

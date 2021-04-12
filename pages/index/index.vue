@@ -1,25 +1,6 @@
 <template>
 	<view class="container">
 		
-		<!--header-->
-		<view class="tui-header">
-			<view class="tui-rolling-search">
-				<!-- #ifdef APP-PLUS || MP -->
-				<icon type="search" :size='13' color='#999'></icon>
-				<!-- #endif -->
-				<!-- #ifdef H5 -->
-				<view>
-					<tui-icon name="search" :size='16' color='#999'></tui-icon>
-				</view>
-				<!-- #endif -->
-				<swiper vertical autoplay circular interval="8000" class="tui-swiper">
-					<swiper-item v-for="(item,index) in hotSearch" :key="index" class="tui-swiper-item" @tap="search">
-						<view class="tui-hot-item">{{item}}</view>
-					</swiper-item>
-				</swiper>
-			</view>
-		</view>
-		<!--header-->
 		<view class="tui-header-banner">
 			<view class="tui-banner-bg">
 				<view class="tui-primary-bg tui-route-left"></view>
@@ -28,21 +9,30 @@
 				<view class="tui-banner-box">
 					<swiper :indicator-dots="true" :autoplay="true" :interval="5000" :duration="150" class="tui-banner-swiper"
 					 :circular="true" indicator-color="rgba(255, 255, 255, 0.8)" indicator-active-color="#fff">
-						<swiper-item v-for="(item,index) in banner" :key="index" @tap.stop="detail">
-							<image :src="'../../static/images/mall/banner/'+item" class="tui-slide-image" mode="scaleToFill" />
+						<swiper-item v-for="(item,index) in banners" :key="index" @tap.stop="detail(item.id)">
+							<image :src="item.banner_attachment.preview_url" class="tui-slide-image" mode="scaleToFill" />
 						</swiper-item>
 					</swiper>
 				</view>
 			</view>
 		</view>
+		
+		
 
 		<view class="tui-product-category">
-			<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name" @tap="more">
+			<view class='tui-notice-board' v-if="content">
+				<view class="tui-icon-bg">
+					<tui-icon name="news-fill" :size='24' color='#f54f46'></tui-icon>
+				</view>
+				<view class="tui-scorll-view">
+					<view class="tui-notice tui-animation">{{content}}</view>
+				</view>
+			</view>
+			<view class="tui-category-item" v-for="(item,index) in categories" :key="index" :data-key="item.name" @tap="more(item.id)">
 				<image :src="'../../static/images/mall/category/'+item.img" class="tui-category-img" mode="scaleToFill"></image>
 				<view class="tui-category-name">{{item.name}}</view>
 			</view>
 		</view>
-
 
 		<view class="tui-product-box">
 			<view class="tui-group-name">
@@ -50,18 +40,18 @@
 			</view>
 			<view class="tui-product-list">
 				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2!=0">
+					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2!=0">
 						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'../../static/images/mall/product/detail/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
+							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
 							<view class="tui-pro-content">
 								<view class="tui-pro-tit">{{item.name}}</view>
 								<view>
 									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
+										<text class="tui-sale-price">￥{{item.price}}</text>
+										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
 									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									<view class="tui-pro-pay">{{item.sale}}人付款</view>
 								</view>
 							</view>
 						</view>
@@ -70,18 +60,18 @@
 					</block>
 				</view>
 				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2==0">
+					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2==0">
 						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'../../static/images/mall/product/detail/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
+							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
 							<view class="tui-pro-content">
 								<view class="tui-pro-tit">{{item.name}}</view>
 								<view>
 									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
+										<text class="tui-sale-price">￥{{item.price}}</text>
+										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
 									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									<view class="tui-pro-pay">{{item.sale}}人付款</view>
 								</view>
 							</view>
 						</view>
@@ -91,144 +81,144 @@
 				</view>
 			</view>
 		</view>
-
+		<tui-modal :show="isCanUse" @cancel="hideUserInfo" :custom="true" :maskClosable="false">
+			<view class="tui-modal-custom">
+				<image src="/static/images/logo.png" class="tui-tips-img"></image>
+				<view class="tui-modal-custom-text">申请获取以下权限</view>
+				<view class="tui-modal-custom-text-small">获取您的公开信息(昵称，头像，性别)</view>
+				<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
+			
+			</view>
+		</tui-modal>
 		<!--加载loadding-->
-		<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
-		<!-- <tui-nomore visible="{{!pullUpOn}}"></tui-nomore> -->
-		<!--加载loadding-->
-		<view class="tui-safearea-bottom"></view>
 	</view>
 </template>
 <script>
 	import tuiIcon from "@/components/icon/icon"
 	import tuiTag from "@/components/tag/tag"
+	import tuiModal from "@/components/modal/modal"
+	import tuiButton from "@/components/extend/button/button"
 	import tuiLoadmore from "@/components/loadmore/loadmore"
 	import tuiNomore from "@/components/nomore/nomore"
+	import api from "../../api.js"
 	export default {
 		components: {
 			tuiIcon,
 			tuiTag,
 			tuiLoadmore,
-			tuiNomore
+			tuiNomore,
+			tuiModal,
+			tuiButton
 		},
 		data() {
 			return {
 				current: 0,
-				tabbar: [{
-					icon: "home",
-					text: "首页",
-					size: 21
-				}, {
-					icon: "category",
-					text: "分类",
-					size: 24
-				}, {
-					icon: "cart",
-					text: "购物车",
-					size: 22
-				}, {
-					icon: "order",
-					text: "订单",
-					size: 24
-				}],
-				hotSearch: [
-					"LED灯管",
-					"热水器",
-					"小冰箱迷你"
+				SessionKey: '',
+				OpenId: '',
+				nickName: null,
+				avatarUrl: null,
+				news: [],
+				newsIndex: 0,
+				content: '',
+				banners: [
 				],
-				banner: [
-					"1.jpeg",
-					"2.jpeg",
-					"3.jpeg"
-				],
-				category: [{
-					img: "1.png",
-					name: "智能家居"
-				}, {
-					img: "2.png",
-					name: "打孔安装"
-				}, {
+				categories: [
+				{
 					img: "3.png",
-					name: "家具门窗"
+					name: "上门安装",
+					id: '',
+					parentId: ''
 				}, {
+					img: "1.png",
+					name: "家电清洗",
+					id: '',
+					parentId: ''
+				},{
 					img: "4.png",
-					name: "家用电器"
-				}, {
-					img: "5.png",
-					name: "防水补漏"
+					name: "家电维修",
+					id: '',
+					parentId: ''
 				}, {
 					img: "6.png",
-					name: "水电灯具"
+					name: "水电维修",
+					id: '',
+					parentId: ''
+				}, {
+					img: "5.png",
+					name: "家政保洁",
+					id: '',
+					parentId: ''
+				}, {
+					img: "2.png",
+					name: "电机维修",
+					id: '',
+					parentId: ''
 				}, {
 					img: "7.png",
-					name: "管道疏通"
+					name: "二手租售",
+					id: '',
+					parentId: ''
 				}, {
 					img: "8.png",
-					name: "木匠泥工"
+					name: "全屋装修",
+					id: '',
+					parentId: ''
+					
 				}],
-				productList: [{
-						img: 1,
-						name: "客厅灯 led吸顶灯卧室灯现代简约餐厅儿童房书房灯具套餐套装全屋灯饰 流星款 圆形40CM 三色变光（48W）",
-						sale: 599,
-						factory: 899,
-						payNum: 2342
-					},
-					{
-						img: 2,
-						name: "王力防盗门甲级门安全门大门霸王锁芯进户门入户门子母门/单门GL208选配指纹锁门 950*2050标尺",
-						sale: 29,
-						factory: 69,
-						payNum: 999
-					},
-					{
-						img: 3,
-						name: "泉美 led客厅灯三室两厅北欧简约现代卧室灯铁艺灯具套餐木质大气网红艺术吸顶灯 套餐9三室两厅无极遥控",
-						sale: 299,
-						factory: 699,
-						payNum: 666
-					},
-					{
-						img: 4,
-						name: "泉美 led北欧客厅卧室吸顶灯现代简约餐厅全屋灯具套餐铁艺木质网红灯饰 套餐15四室两厅无极+三色",
-						sale: 1599,
-						factory: 2899,
-						payNum: 236
-					},
-					{
-						img: 1,
-						name: "客厅灯 led吸顶灯卧室灯现代简约餐厅儿童房书房灯具套餐套装全屋灯饰 流星款 圆形40CM 三色变光（48W）",
-						sale: 599,
-						factory: 899,
-						payNum: 2342
-					},
-					{
-						img: 2,
-						name: "泉美 led北欧客厅卧室吸顶灯现代简约餐厅全屋灯具套餐铁艺木质网红灯饰 套餐15四室两厅无极+三色",
-						sale: 29,
-						factory: 69,
-						payNum: 999
-					},
-					{
-						img: 3,
-						name: "林内(Rinnai)璀璨系列16升燃气热水器 升级智慧芯 水气双调 天然气12T RUS-16QC05（JSQ31-C05）",
-						sale: 299,
-						factory: 699,
-						payNum: 666
-					},
-					{
-						img: 4,
-						name: "海尔（Haier）16升水伺服恒温燃气热水器智能变升智护自清洁手机APP遥控JSQ31-16JM6(12T)U1天然气",
-						sale: 1599,
-						factory: 2899,
-						payNum: 236
-					}
+				products: [
 				],
 				pageIndex: 1,
 				loadding: false,
 				pullUpOn: true
 			}
 		},
+		onLoad() {//默认加载
+			this.getData();
+			this.tui.showSubscribe()
+		},
 		methods: {
+			setNews(){
+				if(this.news[0]){
+					if(this.newsIndex == this.news.length - 1){
+						this.newsIndex  = 0
+					}else{
+						this.newsIndex  += 1
+					}
+				}
+				this.content = this.news[this.newsIndex].content
+			},
+			getData(){
+				let _this = this
+				api.banners().then(function(data){
+					_this.banners = data
+				}).catch(function(error){console.log(error)})
+				api.news().then(function(data){
+					_this.news = data
+					if(_this.news[0]){
+						console.log(_this.news)
+						_this.content = _this.news[0].content
+					}
+					setInterval(_this.setNews,15*1000)
+				}).catch(function(error){console.log(error)})
+				api.categories().then(function(data){
+					data.forEach(function(item,index,arr){
+						_this.setCategoryId(item.name, item.id)
+					})
+				}).catch(function(error){console.log(error)})
+				
+				api.recommendProducts().then(function(data){
+					_this.products = data
+					console.log(data.length)
+				}).catch(function(error){console.log(error)})
+			},
+			setCategoryId(name, id){
+				let _this = this
+				this.categories.forEach(function(category, index, categories){
+					if(category.name == name){
+						_this.categories[index].id = id
+					}
+				})
+			},
 			tabbarSwitch: function(e) {
 				let index = e.currentTarget.dataset.index;
 				this.current = index;
@@ -248,9 +238,9 @@
 					}
 				}
 			},
-			detail: function() {
+			detail: function(id) {
 				uni.navigateTo({
-					url: '../products/show'
+					url: '../products/show?id=' + id
 				})
 			},
 			classify: function() {
@@ -259,10 +249,9 @@
 				})
 
 			},
-			more: function(e) {
-				let key = e.currentTarget.dataset.key || "";
+			more: function(id) {
 				uni.reLaunch({
-					url: '../products/index?searchKey=' + key
+					url: '../products/list?id=' + id
 				})
 
 			},
@@ -273,30 +262,13 @@
 			}
 		},
 		onPullDownRefresh: function() {
-			let loadData = JSON.parse(JSON.stringify(this.productList));
-			loadData = loadData.splice(0, 10)
-			this.productList = loadData;
-			this.pageIndex = 1;
 			this.pullUpOn = true;
 			this.loadding = false
+			this.getData()
 			uni.stopPullDownRefresh()
 		},
 		onReachBottom: function() {
-			if (!this.pullUpOn) return;
-			this.loadding = true;
-			if (this.pageIndex == 4) {
-				this.loadding = false;
-				this.pullUpOn = false
-			} else {
-				let loadData = JSON.parse(JSON.stringify(this.productList));
-				loadData = loadData.splice(0, 10)
-				if (this.pageIndex == 1) {
-					loadData = loadData.reverse();
-				}
-				this.productList = this.productList.concat(loadData);
-				this.pageIndex = this.pageIndex + 1;
-				this.loadding = false
-			}
+			
 		}
 	}
 </script>
@@ -310,9 +282,90 @@
 		padding-bottom: 100rpx;
 		color: #333;
 	}
+	
+	.tui-notice-board {
+		width: 110%;
+		padding-right: 30upx;
+		box-sizing: border-box;
+		font-size: 28upx;
+		height: 60upx;
+		background: #fff8d5;
+		display: flex;
+		align-items: center;
+		z-index: 999;
+		margin-left: -20rpx;
+	}
+	
+	.tui-notice {
+		transform: translateX(100%);
+	}
+	
+	.tui-animation {
+		-webkit-animation: tui-rolling 15s linear infinite;
+		animation: tui-rolling 15s linear infinite;
+	}
+	
+	@-webkit-keyframes tui-rolling {
+		0% {
+			transform: translateX(100%);
+		}
+	
+		100% {
+			transform: translateX(-170%);
+		}
+	}
+	
+	.tui-scorll-view {
+		flex: 1;
+		line-height: 1;
+		white-space: nowrap;
+		overflow: hidden;
+		color: #f54f46;
+	}
+	
+	.tui-icon-bg {
+		background: #fff8d5;
+		padding-left: 30upx;
+		position: relative;
+		z-index: 10;
+	}
 
 	/*tabbar*/
-
+	.tui-btn{
+		width: 100%;
+		position: relative;
+		border: 0 !important;
+		border-radius: 3px;
+		padding-left: 0;
+		padding-right: 0;
+		overflow: visible;
+		height: 38px;
+		line-height: 38px;
+		font-size: 14px;
+	}
+	.danger{
+		background: #EB0909 !important;
+		color: #fff
+	}
+	.tui-modal-custom {
+		text-align: center;
+	}
+	
+	.tui-modal-custom-text {
+		font-size: 30rpx;
+		color: #333;
+	}
+	.tui-modal-custom-text-small {
+		font-size: 18rpx;
+		color: grey;
+		padding: 0rpx 0 50rpx;
+	}
+	.tui-tips-img {
+		width: 200rpx;
+		height: 200rpx;
+		margin-top: 20rpx;
+	}
+	
 	.tui-tabbar {
 		width: 100%;
 		position: fixed;
@@ -445,7 +498,7 @@
 	}
 
 	.tui-header-banner {
-		padding-top: 100rpx;
+		/* padding-top: 100rpx; */
 		box-sizing: border-box;
 		background: #e41f19;
 	}
@@ -769,21 +822,23 @@
 	}
 
 	.tui-sale-price {
-		font-size: 34rpx;
+		font-size: 25rpx;
 		font-weight: 500;
 		color: #e41f19;
 	}
 
 	.tui-factory-price {
-		font-size: 24rpx;
-		color: #a0a0a0;
-		text-decoration: line-through;
-		padding-left: 12rpx;
+		font-size: 18rpx;
+		color: white;
+		padding-left: 5rpx;
+		padding-right: 5rpx;
+		margin-left: 12rpx;
+		background-color: #e41f19;
 	}
 
 	.tui-pro-pay {
 		padding-top: 10rpx;
-		font-size: 24rpx;
+		font-size: 18rpx;
 		color: #656565;
 	}
 </style>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="83137a10-0a3c-4974-93b3-783adb485e95" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages.json" beforeDir="false" afterPath="$PROJECT_DIR$/pages.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/address/edit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/address/edit.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/index/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/index/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/orders/new.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/orders/new.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/orders/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/orders/show.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/products/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/products/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/products/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/pages/products/show.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/banner/1.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/banner/2.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/banner/3.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/6.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/discount.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/new/new.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/product/detail/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/product/detail/2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/product/detail/3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/mall/product/detail/4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/applets.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/call.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/feedback.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/github_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/go.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/icon_out_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/icon_thouUI@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/icon_thouUI_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/log.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_bg_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_def_touxiang_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_icon_bianji_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_icon_chongdian_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_icon_jiayouzhan_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/mine_icon_tingche_3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/reward.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/my/thorui.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/news/avatar_2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/product/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/product/2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/product/3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/product/4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/product/5.jpg" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1ngtyvM29DdBlWRmNMOIcnY0OzK" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="83137a10-0a3c-4974-93b3-783adb485e95" name="Default Changelist" comment="" />
+      <created>1611823819241</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1611823819241</updated>
+      <workItem from="1611823821826" duration="25000" />
+      <workItem from="1612338491270" duration="212000" />
+      <workItem from="1614094178560" duration="19000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+</project>

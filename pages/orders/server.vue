@@ -63,10 +63,6 @@
 		data() {
 			return {
 				tabs: [{
-					name: "全部"
-				}, {
-					name: "待付款"
-				}, {
 					name: "待服务"
 				}, {
 					name: "已完成"
@@ -77,21 +73,17 @@
 				loadding: false,
 				pullUpOn: true,
 				scrollTop: 0,
-				status: '',
-				statuses: ['', 'wait', 'paid', 'served']
+				status: 'paid',
+				statuses: ['paid', 'served']
 			}
 		},
-		onShow: function(){
-			this.orders = []
-			this.pageIndex = 1
-			this.getOrders()
-		},
 		onLoad: function(options){
-			console.log(2)
 			if(options.status){
 				this.status = options.status
 				this.currentTab = this.statuses.indexOf(options.status)
 			}
+			let _this = this
+			this.getOrders()
 		},
 		methods: {
 			change(e) {
@@ -103,20 +95,18 @@
 			},
 			detail(id) {
 				uni.navigateTo({
-					url: '../orders/show?id=' + id
+					url: '../orders/show_server?id=' + id
 				})
 			},
 			getOrders(){
 				let _this = this
-				api.orders(_this.status, _this.pageIndex).then(function(data){
+				api.serverOrders(_this.status, _this.pageIndex).then(function(data){
 					if(data){
 						_this.orders = _this.orders.concat(data)
 					}
 					uni.stopPullDownRefresh()
 					_this.loadding = false
-					if(!data[0]){
-						_this.pullUpOn = false
-					}
+					_this.pullUpOn = false
 				}).catch(function(e){
 					
 				})
@@ -128,10 +118,9 @@
 			this.getOrders()
 		},
 		onReachBottom() {
-			if(this.loadding || !this.pullUpOn){
-				return
-			}
 			//只是测试效果，逻辑以实际数据为准
+			this.loadding = true
+			this.pullUpOn = true
 			this.pageIndex =  this.pageIndex + 1
 			this.getOrders()
 		},
