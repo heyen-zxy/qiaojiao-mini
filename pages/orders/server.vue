@@ -106,7 +106,9 @@
 					}
 					uni.stopPullDownRefresh()
 					_this.loadding = false
-					_this.pullUpOn = false
+					if(!data[0]){
+						_this.pullUpOn = false
+					}
 				}).catch(function(e){
 					
 				})
@@ -119,8 +121,9 @@
 		},
 		onReachBottom() {
 			//只是测试效果，逻辑以实际数据为准
-			this.loadding = true
-			this.pullUpOn = true
+			if(this.loadding || !this.pullUpOn){
+				return
+			}
 			this.pageIndex =  this.pageIndex + 1
 			this.getOrders()
 		},

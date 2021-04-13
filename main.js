@@ -206,7 +206,7 @@ Vue.prototype.tui = tui
 Vue.prototype.$eventHub = Vue.prototype.$eventHub || new Vue()
 Vue.prototype.$store = store
 Vue.prototype.apiUrl = 'http://qiaojiang.mynatapp.cc/api'
-Vue.prototype.apiUrl = 'https://www.jxjiajiang.com/api'
+// Vue.prototype.apiUrl = 'https://www.jxjiajiang.com/api'
 Vue.prototype.imageUrl = 'https://file.jxjiajiang.com/api/'
 App.mpType = 'app'
 

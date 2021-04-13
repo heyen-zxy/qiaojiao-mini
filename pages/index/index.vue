@@ -9,7 +9,7 @@
 				<view class="tui-banner-box">
 					<swiper :indicator-dots="true" :autoplay="true" :interval="5000" :duration="150" class="tui-banner-swiper"
 					 :circular="true" indicator-color="rgba(255, 255, 255, 0.8)" indicator-active-color="#fff">
-						<swiper-item v-for="(item,index) in banners" :key="index" @tap.stop="detail(item.id)">
+						<swiper-item v-for="(item,index) in banners" :key="index" @tap.stop="detail(item.product_id)">
 							<image :src="item.banner_attachment.preview_url" class="tui-slide-image" mode="scaleToFill" />
 						</swiper-item>
 					</swiper>
@@ -174,7 +174,6 @@
 		},
 		onLoad() {//默认加载
 			this.getData();
-			this.tui.showSubscribe()
 		},
 		methods: {
 			setNews(){
