@@ -147,7 +147,7 @@
 						uni.hideLoading()
 						_this.requesting = false
 						if(data.id){
-							uni.navigateTo({
+							uni.redirectTo({
 								url: '../address/index'
 							})
 						}
@@ -159,7 +159,7 @@
 						uni.hideLoading()
 						_this.requesting = false
 						if(data.id){
-							uni.navigateTo({
+							uni.redirectTo({
 								url: '../address/index'
 							})
 						}

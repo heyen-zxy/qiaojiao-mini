@@ -117,11 +117,11 @@
 					<view class="tui-scrollview-box">
 						<view class="tui-number-box tui-bold tui-attr-title">
 							<view class="tui-attr-title">数量</view>
-							<tui-numberbox :max="99" :min="1" :value="value" @change="change"></tui-numberbox>
+							<tui-numberbox :max="999" :min="1" :value="value" @change="change"></tui-numberbox>
 						</view>
 						<view class="tui-bold tui-attr-title">尺寸</view>
 						<view class="tui-attr-box">
-							<view class="tui-attr-item" v-for="(norm,index) in product.norms" :class="selectNorm.id == norm.id ? 'tui-attr-active' : ''" @tap="select(norm.id)">
+							<view class="tui-attr-item" v-for="(norm,normIndex) in product.norms" :key="norm.id"  :class="selectNorm.id == norm.id ? 'tui-attr-active' : ''" @tap="select(norm.id)">
 								{{norm.name}}
 							</view>
 			
@@ -141,13 +141,15 @@
 		</tui-bottom-popup>
 		<!--底部选择层-->
 		
-		<tui-modal :show="isCanUse" @cancel="hideUserInfo" :custom="true" :maskClosable="false">
+		<tui-modal :show="isCanUse" @cancel="notUse" :custom="true" :maskClosable="false">
 			<view class="tui-modal-custom">
 				<image src="/static/images/logo.png" class="tui-tips-img"></image>
 				<view class="tui-modal-custom-text">申请获取以下权限</view>
 				<view class="tui-modal-custom-text-small">获取您的公开信息(昵称，头像，性别)</view>
-				<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
-			
+				<view style="display: flex;">
+					<button class="bottom gray tui-btn modal-btn" type="primary"  lang="zh_CN" @tap="notUse">取消</button>
+					<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
+				</view>
 			</view>
 		</tui-modal>
 		<!--加载loadding-->
@@ -193,7 +195,8 @@
 				value: 1,
 				collected: false,
 				desc: '',
-				ordering: false
+				ordering: false,
+				showModal: false
 			}
 		},
 		onLoad: function(options) {
@@ -302,6 +305,11 @@
 				this.tui.toast("功能开发中~")
 			},
 			submit(){
+				console.log(this.tui.isLogin())
+				if(!this.tui.isLogin()){
+					this.isCanUse = true
+					return
+				}
 				let _this = this
 				if(this.selectNorm.id){
 					this.ordering = true
@@ -309,14 +317,17 @@
 						title: '下单中...'
 					});
 					api.applyOrder(JSON.stringify([{id: this.selectNorm.id, number: this.value}])).then(function(data){
+						uni.hideLoading()
 						if(data.id){
-							uni.hideLoading()
 							_this.ordering = false
-							_this.popupShow = false
 							uni.navigateTo({
 								url: '../orders/show?id=' + data.id
 							})
+						}else{
+							_this.ordering = false
+							_this.tui.toast(data.message)
 						}
+						
 					}).catch(function(error){
 						console.log(error)
 					})
@@ -353,6 +364,40 @@
 
 	.container {
 		padding-bottom: 110rpx;
+	}
+	
+	.danger{
+		background: #EB0909 !important;
+		color: #fff
+	}
+	
+	.gray{
+		background: #ededed !important;
+		color: #999 !important;
+	}
+	
+	.modal-btn {
+		margin: 0 20rpx;
+		width: 45%;
+	}
+	
+	.tui-modal-custom {
+		text-align: center;
+	}
+	.tui-tips-img {
+		width: 200rpx;
+		height: 200rpx;
+		margin-top: 20rpx;
+	}
+	
+	.tui-modal-custom-text {
+		font-size: 30rpx;
+		color: #333;
+	}
+	.tui-modal-custom-text-small {
+		font-size: 18rpx;
+		color: grey;
+		padding: 0rpx 0 50rpx;
 	}
 
 	.tui-header-box {

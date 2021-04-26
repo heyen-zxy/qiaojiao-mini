@@ -25,43 +25,11 @@ const tui = {
 		return uni.getStorageSync("subscribe") ? true : false
 	},
 	setSubscribe: function(){
-		uni.setStorageSync("subscribe", true)
-	},
-	login() {
-		// uni.setStorageSync('newSessionToken', 'PmdaGX2i245s5n5K2xf6')
-		// return
-		if(tui.isLogin()){
-			return
-		}
-		let _this = this;
-		uni.showLoading({
-			title: '登录中...'
-		});
-	   // 1.wx获取登录用户code
-		uni.login({
-			provider: 'weixin',
-			success: function(loginRes) {
-				let code = loginRes.code;
-				console.log(code)
-				//2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息
-				api.wxAuth(code).then(function(data){
-					tui.setSessionToken(data.authentication_token)
-					uni.setStorageSync('share_token', data.share_token);
-					uni.hideLoading();
-					if (!_this.isCanUse) {
-						//非第一次授权获取用户信息
-						_this.wxGetUserInfo()
-					}
-				}).catch(function(e){
-		
-				})
-			},
-		});
+		uni.setStorageSync("subscribe", '1')
 	},
 	cache:function(key, value, seconds) {
 		var timestamp = Date.parse(new Date()) / 1000
-		 console.log(timestamp+"==="+key)
-		if (key && value === null) {
+		if (key && !value) {
 			//删除缓存
 			//获取缓存
 			var val = uni.getStorageSync(key);
@@ -88,22 +56,21 @@ const tui = {
 		}
 	},
 	showSubscribe: function(){
-		console.log(111)
-		if(!tui.isSubscribe()){
-			console.log(222)
-			uni.requestSubscribeMessage({
-				tmplIds: ['h5CtjMGbiLCl7aICaxndzkAa5ExNx7_qVCYN4oiIJSM', 'YEWcpJmcPiVeAg6igaGkcW1cSFGKn8ZaZOM5RZIpBZg', 'A0-kDcODKZr7h-Zc-EEKQFzhaKABp6Ug0m5LfKcdesk'],
-				success: function(){
-					tui.setSubscribe()
-				},
-				fail: function(e){
-					console.log(e)
-				},
-				complete: function(){
-					console.log('sub complete')
-				}
-			})
-		}
+		let that = this
+		uni.requestSubscribeMessage({
+			tmplIds: ['h5CtjMGbiLCl7aICaxndzkAa5ExNx7_qVCYN4oiIJSM', 'YEWcpJmcPiVeAg6igaGkcW1cSFGKn8ZaZOM5RZIpBZg', 'A0-kDcODKZr7h-Zc-EEKQFzhaKABp6Ug0m5LfKcdesk'],
+			success: function(){
+				// tui.setSubscribe()
+				tui.cache('subscribe', '1', 3600 * 24 * 3)
+				that.showSubscribeModal = false
+			},
+			fail: function(e){
+				console.log(e)
+			},
+			complete: function(){
+				console.log('sub complete')
+			}
+		})
 	}
 }
 
@@ -111,35 +78,30 @@ Vue.mixin({
 	data() {
 		return {
 			isCanUse: false,
+			showSubscribeModal: false
 		}
 	},
 	onLoad: function (options) {
-		if(!uni.getStorageSync('newSessionToken')){
-			if(this.$mp.page.route !== 'pages/index/index'){
-				uni.reLaunch({
-					url: '../index/index'
-				})
-			}
-		}
+		// 唤起订阅后 三天内不在唤起
+		this.showSubscribeModal = !tui.cache('subscribe');
 		if(options.scene){
+			console.log(options.scene)
 			var scene = decodeURIComponent(options.scene);
-			if(scene){
-				tui.cache("from_token", options.share_token, 3600*24)
+			var arr = scene.split(';')
+			var ops = {}
+			arr.forEach(function(v, i, ar){
+				let r = v.split('=')
+				ops[r[0]] = r[1]
+			})
+			console.log(ops)
+			if(ops.share_token){
+				tui.cache("from_token", ops.share_token, 3600*24)
 			}
 		}
 		
 		if(options.share_token){
 			console.log("share_token:" + options.share_token)
 			tui.cache("from_token", options.share_token, 3600*24)
-		}
-		let _this = this
-		tui.login();
-		// 判断是否已经授权
-		// uni.setStorageSync('alreadyLogin', true) 
-		let alreadyLogin = uni.getStorageSync('alreadyLogin') 
-		tui.showSubscribe()
-		if(!alreadyLogin){
-			this.isCanUse = true;
 		}
 	},
 	onShareAppMessage: function(res){
@@ -156,48 +118,64 @@ Vue.mixin({
 		}
 	},
 	methods: {
+		notUse: function(){
+			this.isCanUse = false
+		},
+		notSubscribe: function(){
+			this.showSubscribeModal = false
+		},
+		subscribe: function(){
+			this.tui.showSubscribe()
+		},
 		wxGetUserInfo() {
 			let _this = this;
+			_this.isCanUse = false
 			wx.getUserProfile({
 				lang: 'zh_CN',
 				desc: '用于完善个人资料',
-				success: function(infoRes){
-					console.log(infoRes)
-					try {
-						uni.setStorageSync('alreadyLogin', true) // 表示已经授权
-						_this.isCanUse = false
-						api.userInfo(infoRes.userInfo);
-						} catch (e) {}
+				success: function(res){
+					_this.login(res.userInfo)
 				},
 				fail: function(e){
-					console.log(e)
-					uni.getUserInfo({
-						provider: 'weixin',
-						success: function(infoRes) {
-							try {
-								uni.setStorageSync('alreadyLogin', true) // 表示已经授权
-								_this.isCanUse = false
-								api.userInfo(infoRes.userInfo);
-							} catch (e) {}
-						},
-						fail(res) {}
-					});
+					wx.getUserInfo({
+						success: function(res){
+							_this.login(res.userInfo)
+							console.log(res.userInfo)
+						}
+					})
 				},
 				complete: function(e){
-					
+					console.log(e)
 				}
 			})
-			// uni.getUserInfo({
-			// 	provider: 'weixin',
-			// 	success: function(infoRes) {
-			// 		try {
-			// 			uni.setStorageSync('alreadyLogin', true) // 表示已经授权
-			// 			_this.isCanUse = false
-			// 			api.userInfo(infoRes.userInfo);
-			// 		} catch (e) {}
-			// 	},
-			// 	fail(res) {}
-			// });
+		},	
+		login: function(userInfo){
+			if(this.tui.isLogin()){
+				return
+			}
+			let _this = this;
+			uni.showLoading({
+				title: '登录中...'
+			});
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					let code = loginRes.code;
+					api.wxAuth(code).then(function(data){
+						_this.tui.setSessionToken(data.authentication_token)
+						uni.setStorageSync('share_token', data.share_token);
+						api.userInfo(userInfo).then(function(data){
+							uni.hideLoading();
+							console.log(_this.$mp.page.route)
+							if(_this.$mp.page.route == 'pages/my/index'){
+							  _this.getData()
+						    }
+						});
+					}).catch(function(e){
+			
+					})
+				},
+			});	
 		}
 	}
 })
@@ -205,8 +183,8 @@ Vue.mixin({
 Vue.prototype.tui = tui
 Vue.prototype.$eventHub = Vue.prototype.$eventHub || new Vue()
 Vue.prototype.$store = store
-Vue.prototype.apiUrl = 'http://qiaojiang.mynatapp.cc/api'
-// Vue.prototype.apiUrl = 'https://www.jxjiajiang.com/api'
+// Vue.prototype.apiUrl = 'http://qiaojiang.mynatapp.cc/api'
+Vue.prototype.apiUrl = 'https://www.jxjiajiang.com/api'
 Vue.prototype.imageUrl = 'https://file.jxjiajiang.com/api/'
 App.mpType = 'app'
 

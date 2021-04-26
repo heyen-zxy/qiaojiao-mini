@@ -33,7 +33,13 @@
 						<view class="tui-price-large">{{order.view_amount}}</view>
 					</view>
 				</tui-list-cell>
+				<view class="tui-order-btn" v-if="order.status =='wait'" @click="destroy(order.id)">
+					<view class="tui-btn-ml">
+						<tui-button type="danger" :plain="true" width="148rpx" height="56rpx" :size="26" shape="circle">删除</tui-button>
+					</view>
+				</view>
 			</view>
+			<tui-modal :show="modal" @click="handleClick" @cancel="hide" title="提示" content="确定删除该订单吗？"></tui-modal>
 		</view>
 		<!--加载loadding-->
 		<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
@@ -51,6 +57,7 @@
 	import tuiListCell from "@/components/list-cell/list-cell"
 	import tuiSticky from "@/components/sticky/sticky"
 	import api from "../../api.js"
+	import tuiModal from "@/components/modal/modal"
 	export default {
 		components: {
 			tuiTabs,
@@ -58,7 +65,8 @@
 			tuiLoadmore,
 			tuiNomore,
 			tuiListCell,
-			tuiSticky
+			tuiSticky,
+			tuiModal
 		},
 		data() {
 			return {
@@ -71,8 +79,10 @@
 				}, {
 					name: "已完成"
 				}],
+				modal: false,
 				orders: [],
 				currentTab: 'all',
+				currentDelteOrderId: '',
 				pageIndex: 1,
 				loadding: false,
 				pullUpOn: true,
@@ -120,7 +130,37 @@
 				}).catch(function(e){
 					
 				})
-			}
+			},
+			destroy: function(id){
+				this.currentDelteOrderId = id
+				this.modal = true
+			},
+			handleClick: function(e){
+				this.modal = false
+				let index = e.index;
+				let _this = this
+				if (index != 0) {
+					uni.showLoading({
+						mask: true,
+						title: '请求中...'
+					})
+					api.deleteOrder(_this.currentDelteOrderId).then(function(data){
+						if(data.req_status == 'success'){
+							let index = _this.orders.findIndex((o) => o.id == _this.currentDelteOrderId)
+							if(index >= 0){
+								_this.orders.splice(index, 1)
+							}
+							uni.hideLoading()
+						}
+					}).catch(function(e){
+						console.log(e)
+					})
+				}
+				
+			},
+			hide: function(){
+				this.modal = false
+			},
 		},
 		onPullDownRefresh() {
 			this.pageIndex =  0

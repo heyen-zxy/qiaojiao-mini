@@ -1,19 +1,5 @@
 <template>
 	<view class="container">
-		<view class="tui-searchbox">
-			<view class="tui-search-input">
-				<!-- #ifdef APP-PLUS || MP -->
-				<icon type="search" :size='13' color='#333'></icon>
-				<!-- #endif -->
-				<input confirm-type="search" placeholder="搜索商品名" placeholder-class="tui-input-plholder"
-				@confirm="confirmSearch" :value="search"
-				 class="tui-input" />
-			</view>
-			<view class="tui-category" hover-class="opcity" :hover-stay-time="150" @tap="screen" v-if="tags[0]">
-				<tui-icon name="manage-fill" color="#E41F19" :size="22"></tui-icon>
-				<view class="tui-category-scale">品牌</view>
-			</view>
-		</view>
 		<scroll-view scroll-y scroll-with-animation class="tab-view" :scroll-top="scrollTop" :style="{height:height+'px',top:top+'px'}">
 			<view v-for="(item,index) in categories" :key="index" :id="item.id"  class="tab-bar-item" :class="[currentTab==item.id ? 'active' : '']"
 			 :data-current="item.id" @tap.stop="swichNav">
@@ -21,51 +7,23 @@
 			</view>
 		</scroll-view>
 		<block >
-			<scroll-view scroll-y class="right-box" :style="{height:height+'px',top:top+'px'}">
+			<scroll-view scroll-y class="right-box" :style="{height:height+'px',top:top+'px'}" v-if="category">
 				<!--内容部分 start 自定义可删除-->
-				<view class="tui-product-container">
-					<block v-for="(product,index) in products" :key="product.id">
-						<!-- <template is="productItem" data="{{item,index:index,isList:isList}}" /> -->
-						<!--商品列表-->
-						<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150" @tap="detail(product.id)">
-							<image :src="product.main_attachment.preview_url" class="tui-pro-img tui-proimg-list" mode="widthFix" />
-							<view class="tui-pro-content">
-								<view class="tui-pro-tit">{{product.name}}</view>
-								<view>
-									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{product.price}}</text>
-										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣￥{{product.view_commission}}</text> -->
-									</view>
-									<view class="tui-pro-pay">{{product.sale}}人付款</view>
+				<view class="page-view">
+					<view class="class-box">
+						<view class="class-item">
+							<view class="class-name">{{category.name}}</view>
+							<view class="g-container">
+								<view class="g-box" @tap="productsIndex(tag.id)" v-for="(tag, index) in category.tags"  :key="index" :id="tag.id" >
+									<image :src="tag.tag_attachment.preview_url" class="g-image" />
+									<view class="g-title">{{tag.name}}</view>
 								</view>
 							</view>
 						</view>
-						<!--商品列表-->
-					</block>
+					</view>	
 				</view>
-				<!--内容部分 end 自定义可删除-->
 			</scroll-view>
 		</block>
-		<tui-drawer mode="right" :visible="drawer" @close="closeDrawer">
-			<view class="tui-drawer-box" >
-				<scroll-view class="tui-drawer-scroll" scroll-y :style="{height:drawerH+'px'}">
-					<view class="tui-drawer-title">
-						<text class="tui-title-bold">品牌</text>
-					</view>
-					<view class="tui-drawer-content tui-flex-attr">
-						<view class="tui-attr-item" @tap="selectTag(tag.id )" :class="tag.id == tagId ? 'tui-btmItem-active' : '' " v-for="(tag, index) in tags" :key="tag.id">
-							<view class="tui-attr-ellipsis">{{tag.name}}</view>
-						</view>
-					</view>
-				</scroll-view>
-				<view class="tui-attr-btnbox">
-					<view class="tui-attr-safearea">
-						<view class="tui-drawer-btn tui-drawerbtn-black" hover-class="tui-white-hover" :hover-stay-time="150" @tap="resetTag">重置</view>
-						<view class="tui-drawer-btn tui-drawerbtn-primary" hover-class="tui-red-hover" :hover-stay-time="150" @tap="searchTag">确定</view>
-					</view>
-				</view>
-			</view>
-		</tui-drawer>		
 	</view>
 </template>
 
@@ -83,6 +41,7 @@
 				categories: [],
 				products: [],
 				categoryId: '',
+				category: '',
 				height: 0, //scroll-view高度
 				top: 0,
 				currentTab: 0, //预设当前项的值
@@ -103,8 +62,8 @@
 						//#ifdef H5
 						top = 44;
 						//#endif
-						this.height = res.windowHeight - uni.upx2px(header) - 50
-						this.top = top + uni.upx2px(header) + 50
+						this.height = res.windowHeight - uni.upx2px(header)
+						this.top = top + uni.upx2px(header)
 					}
 				});
 			}, 50)
@@ -123,7 +82,7 @@
 					_this.categoryId = options.id
 					_this.currentTab = options.id
 				}
-				_this.getProducts(_this.categoryId)
+				_this.category = _this.categories.find((c) => c.id == _this.categoryId)
 			})
 			
 		},
@@ -168,7 +127,6 @@
 			getTags: function(id){
 				let _this = this
 				api.tags(id).then(function(data){
-					console.log(data)
 					_this.tags = data
 				})
 			},
@@ -179,12 +137,19 @@
 				this.tagId = ''
 				this.getProducts(e.currentTarget.id)
 				this.categoryId = e.currentTarget.id
+				this.category = this.categories.find((c) => c.id == this.categoryId)
 				if (this.currentTab == cur) {
 					return false;
 				} else {
 					this.currentTab = cur;
 					this.checkCor();
 				}
+			},
+			productsIndex: function(tagId){
+				console.log(1111)
+				uni.navigateTo({
+					url: '../products/index?tagId=' + tagId
+				})
 			},
 			//判断当前滚动超过一屏时，设置tab标题滚动条。
 			checkCor: function() {
@@ -442,7 +407,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 26upx;
+		font-size: 35upx;
 		color: #444;
 		font-weight: 400;
 	}
@@ -648,7 +613,7 @@
 	}
 
 	.class-name {
-		font-size: 22upx;
+		font-size: 30upx;
 	}
 
 	.g-container {
@@ -672,6 +637,6 @@
 	}
 
 	.g-title {
-		font-size: 22upx;
+		font-size: 28upx;
 	}
 </style>

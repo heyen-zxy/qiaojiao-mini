@@ -9,7 +9,7 @@
 		</scroll-view>
 		
 		<view class="tui-news-view">
-			<tui-list-cell class="tui-pt20 cell" v-for="(message,index2) in messages">
+			<tui-list-cell class="tui-pt20 cell" v-for="(message,index2) in messages" :key="message.id">
 				<view class="tui-news-flex tui-flex-column" >
 					<view class="tui-sub-box tui-pt20" >
 						<view class="tui-cmt-user">
@@ -25,7 +25,7 @@
 					<view class="tui-news-tbox tui-flex-column tui-flex-between">
 						<view class="tui-news-title tui-pt20">{{message.content}}</view>
 						<view class="tui-news-picbox tui-w-full tui-pt20">
-							<image :src="attachment.preview_url" mode="widthFix" class="tui-block tui-one-four" v-for="(attachment,index3) in message.attachments" :key="attachment.id" ></image>
+							<image :src="attachment.preview_url" mode="widthFix" class="tui-block tui-one-four" v-for="(attachment,index3) in message.attachments" :key="attachment.id" @tap="previewImg(message.id, attachment.preview_url)"></image>
 						</view>
 					</view>
 					<view class="tui-sub-box tui-pt20">
@@ -91,6 +91,21 @@
 			_this.getData()
 		},
 		methods: {
+			previewImg: function(messageId, url){
+				let message = this.messages.find(function(m, i, arr){
+					console.log(m.id)
+					console.log(messageId)
+					return m.id == messageId
+				})
+				let imgs = [] 
+				message.attachments.forEach(function(m, i, arr){
+					imgs.push(m.preview_url)
+				})
+				uni.previewImage({
+					current: url,
+					urls: imgs
+				})
+			},
 			swichNav: function(e) {
 				let cur = e.currentTarget.dataset.current;
 				this.currentTab = cur
@@ -104,7 +119,6 @@
 					_this.messages = _this.messages.concat(data)
 					uni.stopPullDownRefresh();
 					_this.loadding = false;
-					console.log(data)
 					if(!data[0]){
 						_this.pullUpOn = false
 					}
@@ -409,9 +423,7 @@
 		font-size: 34rpx;
 		word-break: break-all;
 		word-wrap: break-word;
-		overflow: hidden;
 		text-overflow: ellipsis;
-		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 		box-sizing: border-box;
@@ -501,7 +513,6 @@
 	.cell::after {
 		content: '';
 		position: absolute;
-		border-bottom: 1upx solid #d2d2d2;
 		-webkit-transform: scaleY(0.5);
 		transform: scaleY(0.5);
 		bottom: 0;

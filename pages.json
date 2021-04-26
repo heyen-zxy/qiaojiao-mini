@@ -13,7 +13,20 @@
 	},{
 		"path": "pages/products/list",
 		"style": {
-			"navigationBarTitleText": "商品服务",
+			"navigationBarTitleText": "商品服务分类",
+			"navigationBarBackgroundColor": "#fff",
+			"navigationBarTextStyle": "black",
+			"backgroundColorTop": "#fcfcfc",
+			"backgroundColorBottom": "#fcfcfc",
+			"disableScroll": false,
+			"app-plus": {
+				"bounce": "none"
+			}
+		}
+	},{
+		"path": "pages/products/index",
+		"style": {
+			"navigationBarTitleText": "商品服务列表",
 			"navigationBarBackgroundColor": "#fff",
 			"navigationBarTextStyle": "black",
 			"backgroundColorTop": "#fcfcfc",
@@ -190,7 +203,7 @@
             "path" : "pages/messages/index",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "我的酬佣",
+                "navigationBarTitleText": "本地消息",
                 "navigationBarBackgroundColor": "#fff",
                 "navigationBarTextStyle": "black",
                 "enablePullDownRefresh": true,

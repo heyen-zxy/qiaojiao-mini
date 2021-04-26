@@ -377,7 +377,7 @@ const api = {
 				method: 'POST',
 				data: {
 					norm_array: norm_array,
-					from_token: uni.getStorageSync('form_token')
+					from_token: Vue.prototype.tui.cache('from_token')
 				},
 				success: (res) => {
 					if (res.data && res.data.error && res.data && res.data.error === "401 Unauthorized") {
@@ -603,12 +603,29 @@ const api = {
 			});
 		})
 	},
-	products: function(searchOptions) {
+	products: function(options) {
 		return new Promise(function(resolve, reject) {
 			uni.request({
 				url: Vue.prototype.apiUrl + '/v1/products', 
 				method: 'GET',
-				data: searchOptions,
+				data: options,
+				header: {
+					'X-Auth-Token': Vue.prototype.tui.getSessionToken()
+				},
+				success: (res) => {
+					resolve(res.data)
+				},
+				fail: (res) => {
+					reject(res)
+				}
+			});
+		})
+	},
+	chargeProductId: function(){
+		return new Promise(function(resolve, reject) {
+			uni.request({
+				url: Vue.prototype.apiUrl + '/v1/products/charge_product_id', 
+				method: 'GET',
 				header: {
 					'X-Auth-Token': Vue.prototype.tui.getSessionToken()
 				},

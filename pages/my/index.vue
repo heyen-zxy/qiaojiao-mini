@@ -10,7 +10,7 @@
 		<!--header-->
 		<view class="tui-mybg-box">
 			<image src="https://www.thorui.cn/wx/static/images/mall/my/img_bg_3x.png" class="tui-my-bg" mode="widthFix"></image>
-			<view class="tui-header-center">
+			<view class="tui-header-center" @tap="login">
 				<image :src="user.avatar_url" class="tui-avatar" ></image>
 				<view class="tui-info">
 					<view class="tui-nickname">{{user.nick_name}}
@@ -50,7 +50,7 @@
 				</view>
 			</view>
 
-			<view class="tui-box tui-assets-box"  >
+			<view class="tui-box tui-assets-box" v-if="tui.isLogin()">
 				<tui-list-cell padding="0" :last="true" :hover="false">
 					<view class="tui-cell-header">
 						<view class="tui-cell-title">我的佣金</view>
@@ -84,7 +84,7 @@
 				</view>
 			</view>
 
-			<view class="tui-box tui-assets-box"  v-if="isAdmin">
+			<view class="tui-box tui-assets-box"  v-if="tui.isLogin() && isAdmin">
 				<tui-list-cell padding="0" :last="true" :hover="false">
 					<view class="tui-cell-header">
 						<view class="tui-cell-title">订单服务佣金</view>
@@ -132,73 +132,49 @@
 						</view>
 						<view class="tui-assets-text">客服电话</view>
 					</view>
+					
+					
 					<view class="tui-order-item">
 						<view class="tui-assets-num">
 							<image src="../../static/images/user.png" style="width: 50rpx;height:50rpx;"></image>
 						</view>
 						<view >
-							<button open-type="contact" class="tui-assets-text" style="background-color: white;">微信客服</button
+							<button open-type="contact" class="tui-assets-text" style="background-color: white;">微信客服</button>
 						</view>
 					</view>
-					<view class="tui-order-item" >
+					<view class="tui-order-item" @tap="subscribeMessage">
+						<view class="tui-assets-num" style="margin-bottom: 15rpx;">
+							<tui-icon name="message-fill" size="20" color="grey"></tui-icon>
+						</view>
+						<view class="tui-assets-text">订阅消息</view>
 					</view>
 				</view>
 			</view>
-
-			<!--为你推荐-->
-			<tui-divider :size="28" :bold="true" color="#333" width="50%">为您推荐</tui-divider>
-			<view class="tui-product-list">
-				<view class="tui-product-container">
-					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2!=0">
-						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
-							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
-							<view class="tui-pro-content">
-								<view class="tui-pro-tit">{{item.name}}</view>
-								<view>
-									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.price}}</text>
-										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
-									</view>
-									<view class="tui-pro-pay">{{item.sale}}人付款</view>
-								</view>
-							</view>
-						</view>
-						<!--商品列表-->
-						<!-- <template is="productItem" data="{{item,index:index}}" /> -->
-					</block>
-				</view>
-				<view class="tui-product-container">
-					<block v-for="(item,index) in products" :key="index" v-if="(index+1)%2==0">
-						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.id)">
-							<image :src="item.attachments[0].preview_url" class="tui-pro-img" mode="widthFix" />
-							<view class="tui-pro-content">
-								<view class="tui-pro-tit">{{item.name}}</view>
-								<view>
-									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.price}}</text>
-										<!-- <text class="tui-factory-price" v-if="item.view_commission">佣:最高￥{{item.view_commission}}</text> -->
-									</view>
-									<view class="tui-pro-pay">{{item.sale}}人付款</view>
-								</view>
-							</view>
-						</view>
-						<!--商品列表-->
-						<!-- <template is="productItem" data="{{item,index:index}}" /> -->
-					</block>
+			</view>
+			<view class="tui-box tui-assets-box" v-if="tui.isLogin()" style="margin-top: 100rpx">
+				<tui-button shape="circle" type="danger" @click="logOut" :size="26">退出登录</tui-button>
+			</view>
+		<!--加载loadding-->
+		<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
+		<tui-modal :show="modal" @cancel="hide" :custom="true" :fadein="true">
+			<view class="tui-modal-custom">
+				<view class="tui-prompt-title">提现金额</view>
+				<input placeholder="请输入提现金额" class="tui-input" v-model="cash" type="number" />
+				<tui-button shape="circle" type="green" @click="handleClick" :size="26">立即提现</tui-button>
+			</view>
+		</tui-modal>
+		
+		<tui-modal :show="isCanUse" @cancel="notUse" :custom="true" :maskClosable="false">
+			<view class="tui-modal-custom">
+				<image src="/static/images/logo.png" class="tui-tips-img"></image>
+				<view class="tui-modal-custom-text">申请获取以下权限</view>
+				<view class="tui-modal-custom-text-small">获取您的公开信息(昵称，头像，性别)</view>
+				<view style="display: flex;">
+					<button class="bottom gray tui-btn modal-btn" type="primary"  lang="zh_CN" @tap="notUse">取消</button>
+					<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
 				</view>
 			</view>
-			</view>
-			<!--加载loadding-->
-			<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
-			<tui-modal :show="modal" @cancel="hide" :custom="true" :fadein="true">
-				<view class="tui-modal-custom">
-					<view class="tui-prompt-title">提现金额</view>
-					<input placeholder="请输入提现金额" class="tui-input" v-model="cash" type="number" />
-					<tui-button shape="circle" type="green" @click="handleClick" :size="26">立即提现</tui-button>
-				</view>
-			</tui-modal>
+		</tui-modal>
 		</view>
 	</view>
 </template>
@@ -221,18 +197,7 @@
 			tuiModal
 		},
 		onShow: function(options){
-			let _this = this
-			api.me().then(function(data){
-				_this.user = data
-				_this.isAdmin = data.admin_id
-			}).catch(function(e){
-				console.log(e)
-			})
-			api.my().then(function(data){
-				_this.myData = data
-			}).catch(function(e){
-				console.log(e)
-			})
+			this.getData()
 		},
 		onLoad: function(options) {
 			let _this = this
@@ -272,10 +237,11 @@
 				pageIndex: 1,
 				loadding: false,
 				pullUpOn: true,
-				user: {},
+				user: {nick_name: '未登录',avatar_url: 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132'},
 				isAdmin: false,
 				modal: false,
 				cash: 0,
+				isLogin: false,
 				myData: {
 					wait_order: 0,
 					paid_order: 0,
@@ -295,12 +261,60 @@
 			}
 		},
 		methods: {
+			getData(){
+				let _this = this
+				if(_this.tui.isLogin()){
+					api.me().then(function(data){
+						_this.user = data
+						_this.isAdmin = data.admin_id
+					}).catch(function(e){
+						console.log(e)
+					})
+					api.my().then(function(data){
+						_this.myData = data
+					}).catch(function(e){
+						console.log(e)
+					})
+				}
+			},
+			logOut(){
+				this.tui.setSessionToken('')
+				this.isAdmin = false
+				this.user = {nick_name: '未登录',avatar_url: 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132'},
+				this.myData = {
+					wait_order: 0,
+					paid_order: 0,
+					served_order: 0,
+					share_order: 0,
+					commission: 0,
+					commission_wait: 0,
+					commission_paid: 0,
+					admin_paid_order: 0,
+					admin_served_order: 0,
+					admin_commission_wait: 0,
+					admin_commission_paid: 0,
+					can_cash: false
+				}
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
+			},
 			phoneCall(){
 				uni.makePhoneCall({
 				    phoneNumber: '15170802003' //仅为示例
 				});
 			},
+			login: function(){
+				if(!this.tui.isLogin()){
+					this.isCanUse = true
+					return
+				}
+			},
 			orders(status){
+				if(!this.tui.isLogin()){
+					this.isCanUse = true
+					return
+				}
 				uni.navigateTo({
 					url: "../orders/index?status=" + status 
 				})
@@ -357,6 +371,10 @@
 			},
 			hide: function(){
 				this.modal = false
+			},
+			subscribeMessage: function(){
+				console.log('subscribeMessage')
+				this.tui.showSubscribe()
 			},
 			handleClick() {
 				console.log(this.cash)
@@ -432,6 +450,41 @@
 		align-items: center;
 		justify-content: center;
 	}
+	
+	.danger{
+		background: #EB0909 !important;
+		color: #fff
+	}
+	
+	.gray{
+		background: #ededed !important;
+		color: #999 !important;
+	}
+	
+	.modal-btn {
+		margin: 0 20rpx;
+		width: 45%;
+	}
+	
+	.tui-modal-custom {
+		text-align: center;
+	}
+	.tui-tips-img {
+		width: 200rpx;
+		height: 200rpx;
+		margin-top: 20rpx;
+	}
+	
+	.tui-modal-custom-text {
+		font-size: 30rpx;
+		color: #333;
+	}
+	.tui-modal-custom-text-small {
+		font-size: 18rpx;
+		color: grey;
+		padding: 0rpx 0 50rpx;
+	}
+	
 
 	/* #ifndef MP */
 	.tui-header-icon {

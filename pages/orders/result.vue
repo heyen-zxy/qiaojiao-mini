@@ -18,20 +18,33 @@
 				付款成功后，佳匠服务不会以付款异常、卡单、系统升级为由联系您。请勿泄露银行卡号、手机验证码，否则会造成钱款损失！谨防电话诈骗！
 			</view>
 		</view>
+		<tui-modal :show="showSubscribeModal" @cancel="notSubscribe" :custom="true" :maskClosable="false">
+			<view class="tui-modal-custom">
+				<view class="tui-modal-custom-text">授权佳匠服务给您发送订单状态的微信消息</view>
+				<view style="display: flex;">
+					<button class="bottom gray tui-btn modal-btn" type="primary"  lang="zh_CN" @tap="notSubscribe">取消</button>
+					<button class="bottom success tui-btn modal-btn" type="primary" lang="zh_CN" @tap="subscribe">授权</button>
+				</view>
+			</view>
+		</tui-modal>
+		<!--加载loadding-->
 	</view>
 </template>
 
 <script>
 	import tuiButton from "@/components/extend/button/button"
+	import tuiModal from "@/components/modal/modal"
 	export default {
 		components: {
-			tuiButton
+			tuiButton,
+			tuiModal
 		},
 		data() {
-			return {}
+			return {
+				modal: false
+			}
 		},
 		onLoad: function(){
-			this.tui.showSubscribe()
 		},
 		methods: {
 			go(page) {
@@ -50,6 +63,43 @@
 </script>
 
 <style>
+	
+	.danger{
+		background: #EB0909 !important;
+		color: #fff
+	}
+	
+	.gray{
+		background: #ededed !important;
+		color: #999 !important;
+	}
+	
+	.modal-btn {
+		margin: 0 20rpx;
+		width: 45%;
+	}
+	
+	.tui-modal-custom {
+		text-align: center;
+	}
+	.tui-tips-img {
+		width: 200rpx;
+		height: 200rpx;
+		margin-top: 20rpx;
+	}
+	
+	.tui-modal-custom-text {
+		font-size: 30rpx;
+		color: #333;
+		padding-top: 50rpx;
+		padding-bottom: 50rpx;
+	}
+	.tui-modal-custom-text-small {
+		font-size: 18rpx;
+		color: grey;
+		padding: 0rpx 0 50rpx;
+	}
+	
 	.tui-bg {
 		width: 100%;
 		height: 260rpx;

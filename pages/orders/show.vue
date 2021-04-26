@@ -95,8 +95,8 @@
 		</view>
 		<view class="tui-safe-area"></view>
 		<view class="tui-tabbar tui-order-btn">
-			<view class="tui-btn-mr" v-if="order.status == 'wait'">
-				<tui-button type="danger" width="148rpx" height="56rpx" :size="26" shape="circle" @click="destroy">删除</tui-button>
+			<view class="tui-btn-mr" v-if="chargeProductId && (order.status == 'paid' || order.status == 'served')">
+				<tui-button type="danger" width="148rpx" height="56rpx" :size="26" shape="circle" @click="charge">补差价</tui-button>
 			</view>
 			<view class="tui-btn-mr" v-if="order.status == 'wait'">
 				<tui-button type="green" width="148rpx" height="56rpx" :size="26" shape="circle" @click="pay">立即支付</tui-button>
@@ -135,7 +135,8 @@
 				},
 				timer: '',
 				desc: '',
-				modal: false
+				modal: false,
+				chargeProductId: ''
 			}
 			
 		},
@@ -144,10 +145,15 @@
 			let _this = this
 			api.order(options.id).then(function(data){
 				_this.order = data
-				console.log(data)
 				if(data.address){
 					_this.address = data.address
 				}
+			}).catch(function(error){
+				console.log(error)
+			})
+			api.chargeProductId().then(function(data){
+				console.log(data)
+				_this.chargeProductId = data.charge_product_id
 			}).catch(function(error){
 				console.log(error)
 			})
@@ -157,7 +163,6 @@
 					console.log(_this.address.id )
 					if(_this.address.id){
 						api.address(_this.address.id).then(function(data){
-							console.log(data)
 							_this.address = data
 							console.log(_this.address.id)
 						}).catch(function(error){
@@ -219,7 +224,7 @@
 					})
 					api.deleteOrder(_this.order.id).then(function(data){
 						if(data.req_status == 'success'){
-							uni.navigateBack({
+							uni.redirectTo({
 								url: '../orders/index'
 							})
 						}
@@ -231,6 +236,13 @@
 			},
 			hide: function(){
 				this.modal = false
+			},
+			charge: function(){
+				if(this.chargeProductId){
+					uni.navigateTo({
+						url: '../products/show?id=' + this.chargeProductId + "&server_user_id=" + this.order.admin_id
+					})
+				}
 			},
 			pay: function(){
 				let _this = this
@@ -275,10 +287,16 @@
 								console.log('completed')
 							}
 						})
+						_this.timer = setInterval(function() {
+							_this.checkOrder()
+						}, 2000);
+					}else{
+						uni.hideLoading()
+						uni.showModal({
+							content: data.message,
+							showCancel: false
+						})
 					}
-					_this.timer = setInterval(function() {
-						_this.checkOrder()
-					}, 2000);
 				}).catch(function(e){
 					console.log(data)
 				})

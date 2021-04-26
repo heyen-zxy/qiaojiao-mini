@@ -81,15 +81,6 @@
 				</view>
 			</view>
 		</view>
-		<tui-modal :show="isCanUse" @cancel="hideUserInfo" :custom="true" :maskClosable="false">
-			<view class="tui-modal-custom">
-				<image src="/static/images/logo.png" class="tui-tips-img"></image>
-				<view class="tui-modal-custom-text">申请获取以下权限</view>
-				<view class="tui-modal-custom-text-small">获取您的公开信息(昵称，头像，性别)</view>
-				<button class="bottom danger tui-btn" type="primary" open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="wxGetUserInfo">授权登录</button>
-			
-			</view>
-		</tui-modal>
 		<!--加载loadding-->
 	</view>
 </template>
@@ -240,6 +231,7 @@
 			detail: function(id) {
 				uni.navigateTo({
 					url: '../products/show?id=' + id
+					// url: 'orders/result'
 				})
 			},
 			classify: function() {
@@ -276,7 +268,12 @@
 	page {
 		background: #f7f7f7;
 	}
-
+	
+	.model-btn {
+		margin-left: 20rpx;
+		margin-right: 20rpx;
+	}
+	
 	.container {
 		padding-bottom: 100rpx;
 		color: #333;
@@ -346,6 +343,12 @@
 		background: #EB0909 !important;
 		color: #fff
 	}
+	
+	.gray{
+		background: #ededed !important;
+		color: #999 !important;
+	}
+	
 	.tui-modal-custom {
 		text-align: center;
 	}
